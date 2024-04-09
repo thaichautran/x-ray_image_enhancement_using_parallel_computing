@@ -1,0 +1,36 @@
+.modal-upload {
+    display: flex;
+    margin-bottom: 2rem;
+    .modal-upload-file {
+        width: 40%;
+    }
+    .modal-upload-info {
+        width: 60%;
+        text-align: center;
+
+        .modal-upload-info-top {
+            display: flex;
+            justify-content: space-around;
+        }
+        .modal-upload-info-form {
+            margin-top: 2rem;
+        }
+    }
+}
+
+.ant-modal {
+    .ant-modal-content {
+        .ant-modal-footer {
+            .ant-btn {
+                span {
+                    font-size: 0.8rem;
+                }
+                &:nth-child(2) {
+                    span {
+                        color: #fff !important;
+                    }
+                }
+            }
+        }
+    }
+}

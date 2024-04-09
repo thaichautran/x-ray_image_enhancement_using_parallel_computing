@@ -1,0 +1,294 @@
+body {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  color: #1c1c1c;
+  font-size: 16px;
+  font-weight: 400;
+}
+
+@font-face {
+  font-family: "fontWeb";
+  src: url("../../fonts/Poppins-Regular.ttf") format("ttf"), url("../../fonts/Poppins-Light.ttf") format("ttf"), url("../../fonts/Poppins-Bold.ttf") format("ttf");
+}
+* {
+  font-family: "fontWeb", sans-serif;
+}
+
+.circle {
+  display: inline-block;
+  width: 1.375rem;
+  height: 1.375rem;
+  border-radius: 50%;
+  background-color: #12cc30;
+}
+
+@media screen and (max-width: 1401px) {
+  .collapsed {
+    left: calc(16vw + 10px) !important;
+  }
+}
+@media screen and (min-width: 1201px) and (max-width: 1400px) {
+  .collapsed {
+    left: calc(18vw + 10px) !important;
+    width: calc(80vw - 10px) !important;
+  }
+}
+@media screen and (max-width: 1200px) {
+  .collapsed {
+    left: calc(20vw + 10px) !important;
+    width: calc(77vw - 10px) !important;
+  }
+}
+@media screen and (max-width: 992px) {
+  .collapsed {
+    left: calc(25vw + 10px) !important;
+    width: calc(71vw - 10px) !important;
+  }
+  .collapsed .username {
+    display: none !important;
+  }
+}
+@media screen and (min-width: 769px) and (max-width: 800px) {
+  .collapsed {
+    left: calc(30vw + 10px) !important;
+    width: calc(66vw - 10px) !important;
+  }
+}
+@media screen and (max-width: 768px) {
+  .collapsed {
+    left: calc(30vw + 10px) !important;
+    width: calc(66vw - 10px) !important;
+  }
+}
+@media screen and (min-width: 577px) and (max-width: 700px) {
+  .collapsed {
+    left: calc(37vw + 10px) !important;
+    width: calc(60vw - 10px) !important;
+  }
+  .collapsed .btn-help {
+    display: none !important;
+  }
+}
+@media screen and (max-width: 576px) {
+  .collapsed {
+    left: calc(45vw + 10px) !important;
+    width: calc(88vw - 10px) !important;
+  }
+  .collapsed .btn-upload,
+  .collapsed .btn-help {
+    display: none !important;
+  }
+  .collapsed .btn-sider {
+    width: 150px !important;
+  }
+}
+@media screen and (max-width: 400px) {
+  .collapsed {
+    left: calc(14vw + 10px) !important;
+    width: calc(88vw - 10px) !important;
+  }
+  .collapsed .btn-upload,
+  .collapsed .btn-help {
+    display: none !important;
+  }
+  .collapsed .btn-sider {
+    width: 150px !important;
+  }
+}
+
+@media screen and (max-width: 1200px) {
+  .notCollapsed {
+    left: calc(7vw + 10px) !important;
+    width: calc(89vw - 10px) !important;
+  }
+}
+@media screen and (max-width: 800px) {
+  .notCollapsed {
+    left: calc(9vw + 10px) !important;
+    width: 100% !important;
+    width: calc(87vw - 10px) !important;
+  }
+}
+@media screen and (max-width: 768px) {
+  .notCollapsed {
+    left: 0 !important;
+    width: 100% !important;
+  }
+  .notCollapsed .username {
+    display: none !important;
+  }
+}
+@media screen and (max-width: 576px) {
+  .notCollapsed {
+    left: 0 !important;
+    width: 100% !important;
+  }
+  .notCollapsed .username,
+  .notCollapsed .btn-help {
+    display: none !important;
+  }
+  .notCollapsed .btn-upload {
+    margin-right: 0 !important;
+  }
+  .notCollapsed .header-right {
+    min-width: 50% !important;
+  }
+  .notCollapsed .btn-sider {
+    width: 120px !important;
+  }
+}
+
+@media screen and (max-width: 1401px) {
+  .collapsed-with-auth {
+    left: calc(16vw + 10px) !important;
+  }
+}
+@media screen and (min-width: 1201px) and (max-width: 1400px) {
+  .collapsed-with-auth {
+    left: calc(18vw + 10px) !important;
+    width: calc(79vw - 10px) !important;
+  }
+}
+@media screen and (max-width: 1200px) {
+  .collapsed-with-auth {
+    left: calc(20vw + 10px) !important;
+    width: calc(77vw - 10px) !important;
+  }
+}
+@media screen and (max-width: 992px) {
+  .collapsed-with-auth {
+    left: calc(25vw + 10px) !important;
+    width: calc(71vw - 10px) !important;
+  }
+  .collapsed-with-auth .btn-upload,
+  .collapsed-with-auth .btn-help {
+    display: none !important;
+  }
+}
+@media screen and (min-width: 769px) and (max-width: 800px) {
+  .collapsed-with-auth {
+    left: calc(30vw + 10px) !important;
+    width: calc(66vw - 10px) !important;
+  }
+  .collapsed-with-auth .btn-upload,
+  .collapsed-with-auth .btn-help {
+    display: none !important;
+  }
+}
+@media screen and (max-width: 768px) {
+  .collapsed-with-auth {
+    left: calc(30vw + 10px) !important;
+    width: calc(66vw - 10px) !important;
+  }
+  .collapsed-with-auth .btn-upload,
+  .collapsed-with-auth .btn-help {
+    display: none !important;
+  }
+}
+@media screen and (min-width: 577px) and (max-width: 700px) {
+  .collapsed-with-auth {
+    left: calc(37vw + 10px) !important;
+    width: calc(60vw - 10px) !important;
+  }
+  .collapsed-with-auth .btn-help,
+  .collapsed-with-auth .btn-upload {
+    display: none !important;
+  }
+}
+@media screen and (max-width: 576px) {
+  .collapsed-with-auth {
+    left: calc(45vw + 10px) !important;
+    width: calc(75vw - 10px) !important;
+  }
+  .collapsed-with-auth .search,
+  .collapsed-with-auth .btn-upload,
+  .collapsed-with-auth .btn-help,
+  .collapsed-with-auth .btn-avatar {
+    display: none !important;
+  }
+}
+@media screen and (max-width: 400px) {
+  .collapsed-with-auth {
+    left: calc(10vw + 10px) !important;
+    width: calc(90vw - 10px) !important;
+  }
+  .collapsed-with-auth .search,
+  .collapsed-with-auth .btn-upload,
+  .collapsed-with-auth .btn-help,
+  .collapsed-with-auth .btn-avatar {
+    display: none !important;
+  }
+}
+
+@media screen and (max-width: 1200px) {
+  .notCollapsed-with-auth {
+    left: calc(7vw + 10px) !important;
+    width: calc(89vw - 10px) !important;
+  }
+}
+@media screen and (min-width: 769px) and (max-width: 815px) {
+  .notCollapsed-with-auth {
+    left: calc(9vw + 10px) !important;
+    width: 100% !important;
+    width: calc(87vw - 10px) !important;
+  }
+  .notCollapsed-with-auth .btn-help,
+  .notCollapsed-with-auth .btn-upload {
+    display: none !important;
+  }
+}
+@media screen and (max-width: 768px) {
+  .notCollapsed-with-auth {
+    left: 0 !important;
+    width: 100% !important;
+  }
+  .notCollapsed-with-auth .btn-help,
+  .notCollapsed-with-auth .btn-upload {
+    display: none !important;
+  }
+}
+@media screen and (max-width: 576px) {
+  .notCollapsed-with-auth .header-right {
+    min-width: 50% !important;
+  }
+  .notCollapsed-with-auth .btn-sider {
+    width: 100px !important;
+  }
+}
+@media screen and (max-width: 500px) {
+  .notCollapsed-with-auth .header-right {
+    min-width: 64% !important;
+  }
+  .notCollapsed-with-auth .btn-sider {
+    width: 150px !important;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .app-content {
+    margin: 0 !important;
+  }
+}
+
+@media screen and (max-width: 500px) {
+  #default-layout .float-button-group {
+    bottom: 115px !important;
+    right: 27px !important;
+  }
+}
+@media screen and (max-width: 400px) {
+  #default-layout .float-button-group {
+    right: 33px !important;
+    bottom: 100px !important;
+  }
+}
+
+@font-face {
+  font-family: fontLogo;
+  src: url("../../../assets/fonts/ArgentumSans-Light.otf");
+}
+.logo-text {
+  font-family: fontLogo;
+  font-size: 20px;
+}/*# sourceMappingURL=main.css.map */
