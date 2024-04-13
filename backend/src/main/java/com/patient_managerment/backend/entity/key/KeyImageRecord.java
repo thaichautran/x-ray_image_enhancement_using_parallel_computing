@@ -1,0 +1,37 @@
+package com.patient_managerment.backend.entity.key;
+import jakarta.persistence.Column;
+
+import java.io.Serializable;
+
+public class KeyImageRecord implements Serializable {
+    @Column(name = "album_id")
+    private int albumId;
+
+    @Column(name = "record_id")
+    private int recordId;
+
+    public KeyImageRecord() {
+
+    }
+
+    public KeyImageRecord(int albumId, int recordId) {
+        this.albumId = albumId;
+        this.recordId = recordId;
+    }
+
+    public int getAlbumId() {
+        return albumId;
+    }
+
+    public void setAlbumId(int albumId) {
+        this.albumId = albumId;
+    }
+
+    public int getRecordId() {
+        return recordId;
+    }
+
+    public void setRecordId(int recordId) {
+        this.recordId = recordId;
+    }
+}
