@@ -1,7 +1,8 @@
 import React from "react";
 import { useState } from "react";
-import { Col, Modal } from "antd";
+import { Button, Col, Modal } from "antd";
 import ImageModal from "../Modals/ImageModal";
+import { ThunderboltOutlined, StarOutlined } from "@ant-design/icons";
 import "../../assets/scss/components/ImageItem.scss";
 export default function ImageItem({ image }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -21,21 +22,39 @@ export default function ImageItem({ image }) {
         onClick={() => {
           showModal();
         }}
+        style={{ cursor: "pointer" }}
       >
         <img className="image" src={image.image_url} alt={image.patient_name} />
       </Col>
 
       <Modal
-        title="Basic Modal"
+        width={1100}
         open={isModalOpen}
         onOk={() => {
           handleOk();
         }}
-        onCancel={() => {
-          handleCancel();
-        }}
+        closable={false}
+        footer={
+          <div style={{ textAlign: "-webkit-right" }}>
+            <div
+              style={{
+                display: "flex",
+                textAlign: "left",
+                justifyContent: "space-between",
+                width: "50%",
+              }}
+            >
+              <Button>
+                <StarOutlined /> Chú ý
+              </Button>
+              <Button>
+                <ThunderboltOutlined /> Tăng cường ảnh
+              </Button>
+            </div>
+          </div>
+        }
       >
-        <ImageModal></ImageModal>
+        <ImageModal image={image} onCancel={handleCancel}></ImageModal>
       </Modal>
     </div>
   );
