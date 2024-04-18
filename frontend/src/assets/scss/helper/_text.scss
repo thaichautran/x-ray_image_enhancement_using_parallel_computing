@@ -16,3 +16,14 @@
         @include hoverLink($color-gray-bold);
     }
 }
+.list-item-hover {
+    &:hover {
+        background-color: #696a6b;
+    }
+    transition: all 0.5s;
+}
+.list-item-des-hover {
+    &:hover {
+        color: white;
+    }
+}

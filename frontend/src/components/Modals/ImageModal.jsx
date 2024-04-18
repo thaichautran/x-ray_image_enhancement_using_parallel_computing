@@ -37,9 +37,19 @@ export default function ImageModal({ image, onCancel }) {
   const { TextArea } = Input;
   const [isEdit, setIsEdit] = useState(false);
   const [images, setImages] = useState([]);
+  const [defaultDate, setDefaultDate] = useState([]);
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState([]);
-
+  //user info
+  const [patientName, setPatientName] = useState(image.patient_name);
+  const [createDate, setCreateDate] = useState(image.create_date);
+  const [patientAddress, setPatientAddress] = useState(image.patient_address);
+  const [patientSex, setPatientSex] = useState(image.patient_sex);
+  const [patientAge, setPatientAge] = useState(image.patient_age);
+  const [medicaHistory, setMedicaHistory] = useState(image.medica_history);
+  const [note, setNote] = useState(image.note);
+  const [mark, setMark] = useState(image.mark);
+  const [imageUrl, setImageUrl] = useState(image.image_url);
   const loadMoreData = () => {
     if (loading) {
       return;
@@ -49,7 +59,19 @@ export default function ImageModal({ image, onCancel }) {
     console.log(data);
     setLoading(false);
   };
+  const setNewImage = (image) => {
+    setImageUrl(image.image_url);
+    setPatientName(image.patient_name);
+    setCreateDate(image.create_date);
+    setPatientAge(image.patient_age);
+    setPatientAddress(image.patient_address);
+    setPatientSex(image.patient_sex);
+    setMedicaHistory(image.medica_history);
+    setNote(image.note);
+    setMark(image.mark);
+  };
   useEffect(() => {
+    setDefaultDate(dayjs(image.create_date).format("DD/MM/YYYY"));
     loadMoreData();
     setImages(imageList.map((img) => img.image_url));
   }, []);
@@ -99,11 +121,14 @@ export default function ImageModal({ image, onCancel }) {
       <Row style={{ justifyContent: "space-between" }} gutter={16}>
         <Col span={12}>
           <Image.PreviewGroup items={images}>
-            <Image
-              style={{ width: "100%", height: "100%" }}
-              src={image.image_url}
-            />
+            <Image width={"100%"} src={imageUrl} />
           </Image.PreviewGroup>
+          <h2>Ghi chú</h2>
+          {isEdit ? (
+            <TextArea style={{ width: "100%" }} defaultValue={note}></TextArea>
+          ) : (
+            <p>{note}</p>
+          )}
         </Col>
         <Col span={12}>
           <Row>
@@ -137,7 +162,11 @@ export default function ImageModal({ image, onCancel }) {
               marginTop: "1rem",
             }}
           >
-            <div>
+            <div
+              onClick={() => {
+                setIsEdit(true);
+              }}
+            >
               <Button>
                 <UserSwitchOutlined /> Chỉnh sửa
               </Button>
@@ -151,109 +180,141 @@ export default function ImageModal({ image, onCancel }) {
             </div>
           </div>
           {isEdit ? (
-            <Form layout="vertical">
-              <Form.Item style={{ marginBottom: 0 }}>
+            <Form layout="vertical" variant="borderless">
+              <Form.Item
+                style={{
+                  borderBottom: "1px solid #000",
+                  width: "calc(94% - 12px)",
+                }}
+              >
+                <Input defaultValue={patientName}></Input>
+              </Form.Item>
+
+              <Form.Item
+                style={{
+                  marginBottom: 0,
+                  display: "flex",
+                  justifyContent: "space-between",
+                }}
+              >
+                <ClockCircleOutlined />
                 <Form.Item
-                  label="Name"
                   style={{
                     display: "inline-block",
-                    width: "calc(33.3% - 12px)",
+                    width: "calc(30% - 12px)",
+
+                    borderBottom: "1px solid #000",
                   }}
                 >
-                  <Input />
+                  <DatePicker
+                    placeholder="dd/mm/yyyy"
+                    defaultValue={dayjs(defaultDate, "DD/MM/YYYY")}
+                    format={"DD/MM/YYYY"}
+                  />
                 </Form.Item>
-
+                <EnvironmentOutlined />
                 <Form.Item
-                  label="Sex"
                   style={{
                     display: "inline-block",
-                    width: "calc(33.3% - 12px)",
-                    padding: "0 0.8rem 0 0.8rem",
+                    width: "calc(30% - 12px)",
+
+                    borderBottom: "1px solid #000",
+                  }}
+                >
+                  <Input defaultValue={patientAddress}></Input>
+                </Form.Item>
+                <UserOutlined />
+                <Form.Item
+                  style={{
+                    display: "inline-block",
+                    width: "calc(18% - 12px)",
+
+                    borderBottom: "1px solid #000",
                   }}
                 >
                   <Select
+                    defaultValue={patientSex}
                     options={[
                       {
-                        value: "Male",
-                        label: "Male",
+                        value: "Nam",
+                        label: "Nam",
                       },
                       {
-                        value: "Female",
-                        label: "Female",
+                        value: "Nữ",
+                        label: "Nữ",
                       },
                     ]}
                   ></Select>
                 </Form.Item>
-                <Form.Item
-                  label="Phone Number"
+                <span
                   style={{
-                    display: "inline-block",
-                    width: "calc(33.3% - 12px)",
+                    textAlign: "center",
+                    marginLeft: "0.75rem",
                   }}
                 >
-                  <Input></Input>
+                  {" "}
+                  -{" "}
+                </span>
+                <Form.Item
+                  style={{
+                    display: "inline-block",
+                    width: "calc(10% - 12px)",
+                    borderBottom: "1px solid #000",
+                  }}
+                >
+                  <Input defaultValue={patientAge}></Input>
                 </Form.Item>
+                <span style={{ textAlign: "center", marginLeft: "0.75rem" }}>
+                  tuổi
+                </span>
               </Form.Item>
-              <Form.Item label="Address" style={{ width: "calc(95% - 12px)" }}>
-                <Input></Input>
-              </Form.Item>
-              <Form.Item style={{ marginBottom: 0 }}>
-                <Form.Item
-                  label="Date of birth"
-                  style={{
-                    display: "inline-block",
-                    width: "calc(37% - 12px)",
-                  }}
-                >
-                  <DatePicker placeholder="dd/mm/yyyy"></DatePicker>
-                </Form.Item>
-
-                <Form.Item
-                  label="Height (cm)"
-                  style={{
-                    display: "inline-block",
-                    width: "calc(33.3% - 12px)",
-                    padding: "0 0.8rem 0 0.8rem",
-                  }}
-                >
-                  <Input></Input>
-                </Form.Item>
-                <Form.Item
-                  label="Weight (kg)"
-                  style={{ display: "inline-block", width: "calc(30% - 12px)" }}
-                >
-                  <Input></Input>
-                </Form.Item>
+              <h2 style={{ marginBottom: 0 }}>Tiền sử bệnh nhân</h2>
+              <Form.Item
+                style={{ width: "calc(95% - 12px)", border: "1px solid #000" }}
+              >
+                <TextArea
+                  style={{ height: "125px" }}
+                  defaultValue={medicaHistory}
+                ></TextArea>
               </Form.Item>
               <Form.Item
-                label="Medical records"
-                style={{ display: "inline-block", width: "calc(95% - 12px)" }}
+                style={{ width: "calc(95% - 12px)", textAlign: "right" }}
               >
-                <TextArea style={{ height: "125px" }}></TextArea>
+                <Button
+                  style={{ marginRight: "1rem" }}
+                  onClick={() => {
+                    setIsEdit(false);
+                  }}
+                >
+                  Hủy bỏ
+                </Button>
+                <Button style={{ backgroundColor: "black", color: "white" }}>
+                  Hoàn tất
+                </Button>
               </Form.Item>
             </Form>
           ) : (
             <div>
-              <h1>{image.patient_name}</h1>
+              <h1>{patientName}</h1>
               <Row>
                 <Col flex={1}>
                   <ClockCircleOutlined />
                   &nbsp;
-                  {dayjs(image.created_date).format("DD/MM/YYYY, HH[h]mm[']")}
+                  {dayjs(createDate).format("DD/MM/YYYY, HH[h]mm[']")}
                 </Col>
                 <Col flex={1}>
                   <EnvironmentOutlined />
                   &nbsp;
-                  {image.patient_address}
+                  {patientAddress}
                 </Col>
                 <Col flex={1}>
                   <UserOutlined />
                   &nbsp;
-                  {image.patient_sex} - {image.patient_age} tuổi
+                  {patientSex} - {patientSex} tuổi
                 </Col>
               </Row>
               <h2 style={{ marginBottom: 0 }}>Tiền sử bệnh nhân</h2>
-              <p style={{ margin: 0 }}>{image.medica_history}</p>
+              <p style={{ margin: 0 }}>{medicaHistory}</p>
               <h2 style={{ marginBottom: 0 }}>Ảnh X-quang của bệnh nhân</h2>
               <div
                 id="scrollableDiv"
@@ -288,37 +349,53 @@ export default function ImageModal({ image, onCancel }) {
                     }
                     dataSource={data}
                     renderItem={(item) => (
-                      <List.Item key={item.id}>
-                        <List.Item.Meta
-                          avatar={
-                            <Avatar shape="square" src={item.image_url} />
-                          }
-                          description={
-                            <div
-                              style={{
-                                display: "flex",
-                                justifyContent: "space-around",
-                              }}
-                            >
-                              <span>
-                                {dayjs(item.create_date).format(
-                                  "HH[h]mm, DD/MM/YYYY"
-                                )}
-                              </span>
-                              <span style={{ marginRight: "7rem" }}>
-                                {item.note}
-                              </span>
-                            </div>
-                          }
-                        />
-                        <div>
-                          {item.mark ? (
-                            <StarFilled style={{ color: "yellow" }} />
-                          ) : (
-                            <StarOutlined />
-                          )}
-                        </div>
-                      </List.Item>
+                      <div>
+                        <List.Item
+                          className="list-item-hover"
+                          key={item.id}
+                          style={{
+                            cursor: "pointer",
+                          }}
+                          onClick={() => {
+                            setNewImage(item);
+                          }}
+                        >
+                          <List.Item.Meta
+                            avatar={
+                              <Avatar shape="square" src={item.image_url} />
+                            }
+                            description={
+                              <div
+                                className="list-item-des-hover"
+                                style={{
+                                  display: "flex",
+                                  justifyContent: "space-around",
+                                }}
+                              >
+                                <p style={{ width: "30%" }}>
+                                  {dayjs(item.create_date).format(
+                                    "HH[h]mm, DD/MM/YYYY"
+                                  )}
+                                </p>
+                                <p
+                                  style={{
+                                    width: "55%",
+                                  }}
+                                >
+                                  {item.note}
+                                </p>
+                              </div>
+                            }
+                          />
+                          <div>
+                            {mark ? (
+                              <StarFilled style={{ color: "yellow" }} />
+                            ) : (
+                              <StarOutlined />
+                            )}
+                          </div>
+                        </List.Item>
+                      </div>
                     )}
                   />
                 </InfiniteScroll>
