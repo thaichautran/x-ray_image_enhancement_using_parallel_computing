@@ -5,13 +5,13 @@ import {
   UserOutlined,
   LogoutOutlined,
   FileOutlined,
-  QuestionCircleOutlined,
+  UploadOutlined,
 } from "@ant-design/icons";
-import { Button, Input, Avatar, Dropdown, Space, message } from "antd";
+import { Button, Input, Avatar, Dropdown, Space, message, Modal } from "antd";
 import { Header } from "antd/es/layout/layout";
 import { useNavigate } from "react-router-dom";
 import { searchDocuments } from "../../apis/Documents";
-
+import UploadModal from "../Modals/UploadModal";
 export default function TheHeader({
   setCollapse,
   collapsed,
@@ -22,6 +22,17 @@ export default function TheHeader({
   const [documentList, setDocumentList] = useState([]);
   const [keySearch, setKeySearch] = useState("");
   const [isBlur, setIsBlur] = useState(false);
+  //Modal
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const showModal = () => {
+    setIsModalOpen(true);
+  };
+  const handleOk = () => {
+    setIsModalOpen(false);
+  };
+  const handleCancel = () => {
+    setIsModalOpen(false);
+  };
   let timer = null;
   const debounce = (callback) => {
     if (timer) clearTimeout(timer);
@@ -167,7 +178,23 @@ export default function TheHeader({
             alignItems: "center",
           }}
         >
-          {/* <ModalUpload cateList={cateList}></ModalUpload> */}
+          <Button onClick={showModal} style={{ marginRight: "1rem" }}>
+            <UploadOutlined />
+            Tải lên
+          </Button>
+
+          <Modal
+            title={<h2>Tải lên ảnh X-quang</h2>}
+            open={isModalOpen}
+            onOk={handleOk}
+            onCancel={handleCancel}
+            width={1000}
+            okText="Tải lên"
+            okButtonProps={{ style: { backgroundColor: "#00BDD6" } }}
+            cancelText="Hủy"
+          >
+            <UploadModal></UploadModal>
+          </Modal>
 
           <Space>
             <Avatar

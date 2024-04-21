@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import ImageItem from "./ImageItem";
 import { Row, Col } from "antd";
 export default function ImageList({ imageList }) {

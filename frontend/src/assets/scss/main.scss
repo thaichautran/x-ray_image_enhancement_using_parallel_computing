@@ -1,5 +1,8 @@
 @import "./base/_reset.scss";
 @import "./base/_base.scss";
+@import "./helper/variables";
+@import "./helper/mixin";
 @import "./helper/components.scss";
 @import "./layout/DefaultLayout.scss";
 @import "./components/TheHeader.scss";
+@import "./helper/text";
