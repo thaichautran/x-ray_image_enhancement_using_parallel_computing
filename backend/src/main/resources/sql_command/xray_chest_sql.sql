@@ -64,6 +64,12 @@ add constraint fk_image_record_record_id foreign key(record_id) references recor
 alter table image_record 
 add constraint fk_image_record_album_id foreign key(album_id) references album(id);
 
+alter table record 
+modify column mark boolean;
+
+alter table record 
+add column doctor_note text;
+
 INSERT INTO doctor (name, sex, address, birthday) VALUES ('Nguyen Van A', 'Male', '12A Tran Hung Dao, Ha Noi', '1990-01-01');
 select * from doctor;
 

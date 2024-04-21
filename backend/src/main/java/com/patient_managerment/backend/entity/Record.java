@@ -18,7 +18,7 @@ public class Record {
     private String url;
 
     @Column(name = "mark")
-    private String mark;
+    private boolean mark;
 
     @Column(name = "name")
     private String name;
@@ -53,7 +53,10 @@ public class Record {
     private Date updateDate;
 
     @Column(name = "is_remove")
-    private boolean isRemove;
+    private boolean isRemove = false;
+
+    @Column(name = "doctor_note")
+    private String doctorNote;
 
     @ManyToOne
     @JoinColumn(name =  "doctor_id")
@@ -103,12 +106,20 @@ public class Record {
         this.url = url;
     }
 
-    public String getMark() {
+    public boolean isMark() {
         return mark;
     }
 
-    public void setMark(String mark) {
+    public void setMark(boolean mark) {
         this.mark = mark;
+    }
+
+    public String getDoctorNote() {
+        return doctorNote;
+    }
+
+    public void setDoctorNote(String doctorNote) {
+        this.doctorNote = doctorNote;
     }
 
     public String getName() {
