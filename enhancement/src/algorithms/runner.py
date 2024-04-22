@@ -1,19 +1,21 @@
 import os
 import imageio
-
 from datetime import datetime
-
 import src.arguments as ah
-
 from src.algorithms.um import UM
 from src.algorithms.clahe import CLAHE
 
 class AlgorithmRunner:
 	def __init__(self):
+		# Khởi tạo một đối tượng để xử lý các đối số dòng lệnh
 		self.arg_handler	= ah.ArgumentHandler()
+		# Lấy thuật toán từ các đối số dòng lệnh
 		self.algorithm		= self.arg_handler.get_algorithm()
-		self.image				= self.arg_handler.get_image()
+		# Lấy đường dẫn của ảnh từ các đối số dòng lệnh
+		self.image			= self.arg_handler.get_image()
+		# Lấy đường dẫn thư mục chứa các ảnh từ các đối số dòng lệnh
 		self.images_path	= self.arg_handler.get_path()
+		# Xác định thư mục để lưu trữ kết quả
 		output_path = self.arg_handler.get_output_path()
 		if output_path:
 			self.results_path = output_path
@@ -24,7 +26,7 @@ class AlgorithmRunner:
 
 	def __del__(self):
 		self.algorithm		= ''
-		self.image				= ''
+		self.image			= ''
 		self.images_path	= ''
 		self.results_path	= ''
 
@@ -35,7 +37,7 @@ class AlgorithmRunner:
 			images = os.listdir(self.images_path)
 			path = self.images_path
 		else:
-			# We put in a list to be able to utilize the for loop
+			# Đưa tên ảnh vào một danh sách để có thể sử dụng vòng lặp
 			images = [self.image]
 			path = ""
 
