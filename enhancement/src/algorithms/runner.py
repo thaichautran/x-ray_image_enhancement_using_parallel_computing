@@ -50,7 +50,8 @@ class AlgorithmRunner:
 			t = datetime.now()
 			name = self.image.split(".")[0]
 			filename = f"{t.hour}_{t.minute}_{t.second}_{name}.jpg"
-			imageio.imwrite(os.path.join(self.results_path, filename), processed_image)
+			# imageio.imwrite(os.path.join(self.results_path, filename), processed_image)
+		return processed_image
 
 	def __run_algorithm(self, image, path):
 		'''Runs the algorithm in the image.
