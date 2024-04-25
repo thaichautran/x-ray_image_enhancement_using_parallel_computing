@@ -1,0 +1,7 @@
+Thư mục 1 chứa số lượng ảnh gãy xương: 20.
+Kích thước thư mục 1: 20.5 Mb.
+Nguồn ảnh 1: https://radiopaedia.org/
+Thư mục 2 chứa số lượng ảnh xương bình thường: 20.
+Kích thước thư mục 2: 7.33 Mb.
+Nguồn ảnh 2: https://nihcc.app.box.com/v/ChestXray-NIHCC
+Mặc dù gãy xương sườn là mối liên quan phổ biến của chấn thương và thường có thể đe dọa tính mạng, nhưng rất dễ bỏ sót chúng trên phim chụp X-quang thông thường.
