@@ -3,3 +3,6 @@ imageio
 scipy
 scikit-image
 matplotlib
+opencv-python
+joblib
+numba
