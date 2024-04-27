@@ -3,18 +3,18 @@ import jakarta.persistence.Column;
 
 import java.io.Serializable;
 
-public class KeyImageRecord implements Serializable {
+public class KeyImageAlbum implements Serializable {
     @Column(name = "album_id")
     private int albumId;
 
     @Column(name = "record_id")
     private int recordId;
 
-    public KeyImageRecord() {
+    public KeyImageAlbum() {
 
     }
 
-    public KeyImageRecord(int albumId, int recordId) {
+    public KeyImageAlbum(int albumId, int recordId) {
         this.albumId = albumId;
         this.recordId = recordId;
     }

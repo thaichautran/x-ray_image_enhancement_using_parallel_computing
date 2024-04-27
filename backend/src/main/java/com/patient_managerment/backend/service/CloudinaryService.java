@@ -1,22 +1,27 @@
 package com.patient_managerment.backend.service;
 
 import com.cloudinary.Cloudinary;
+import com.drew.imaging.ImageMetadataReader;
+import com.drew.metadata.Metadata;
+import com.drew.metadata.exif.ExifSubIFDDirectory;
 import com.patient_managerment.backend.dto.ImagesDTO;
+import com.patient_managerment.backend.entity.Album;
 import com.patient_managerment.backend.entity.Doctor;
+import com.patient_managerment.backend.entity.ImageAlbum;
 import com.patient_managerment.backend.entity.Record;
+import com.patient_managerment.backend.entity.key.KeyImageAlbum;
 import com.patient_managerment.backend.imp.CloudinaryServiceImp;
 import com.patient_managerment.backend.payload.request.UploadRequest;
+import com.patient_managerment.backend.repository.AlbumRepository;
 import com.patient_managerment.backend.repository.DoctorRepository;
+import com.patient_managerment.backend.repository.ImageAlbumRepository;
 import com.patient_managerment.backend.repository.RecordRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class CloudinaryService implements CloudinaryServiceImp {
@@ -28,6 +33,12 @@ public class CloudinaryService implements CloudinaryServiceImp {
 
     @Autowired
     RecordRepository recordRepository;
+
+    @Autowired
+    ImageAlbumRepository imageAlbumRepository;
+
+    @Autowired
+    AlbumRepository albumRepository;
     @Override
     public Map upload(MultipartFile file) {
         try {
@@ -38,18 +49,43 @@ public class CloudinaryService implements CloudinaryServiceImp {
         }
     }
 
-   
+
 
     @Override
     public ImagesDTO uploadImages(UploadRequest uploadRequest, List<MultipartFile> files) {
-        System.out.println("Hello world");
-//        System.out.println("file: " + uploadRequest.getFiles());
+        List<Record> listRecordSave = new ArrayList<>();
+        List<String> urls = new ArrayList<>();
+        Optional<Doctor> doctor = doctorRepository.findById(1);
         for(MultipartFile multipartFile : files){
-            System.out.println("Hello world HMD");
+
+            Date originCreatedDate = null;
+
+            try {
+                Metadata metadata = ImageMetadataReader.readMetadata(multipartFile.getInputStream(), multipartFile.getSize());
+
+                // Try to get Exif metadata
+                ExifSubIFDDirectory exifDirectory = metadata.getFirstDirectoryOfType(ExifSubIFDDirectory.class);
+                if (exifDirectory != null) {
+                    Date tempDate = exifDirectory.getDate(ExifSubIFDDirectory.TAG_DATETIME_ORIGINAL);
+                    int hour = tempDate.getHours();
+//                System.out.println("Hour: " + hour);
+                    tempDate.setHours(hour - 7);
+//                System.out.println("Temp date after: " + tempDate);
+                    originCreatedDate = tempDate;
+//                System.out.println("Origin date: " + originCreatedDate);
+                } else {
+                    originCreatedDate = new Date();
+                }
+            } catch (Exception e) {
+                System.out.println("Error to get created date");
+            }
 
             Map data = upload(multipartFile);
             String url = (String) data.get("url");
             System.out.println("url: " + url);
+
+            urls.add(url);
+
             Record record = new Record();
 
             record.setUrl(url);
@@ -63,17 +99,75 @@ public class CloudinaryService implements CloudinaryServiceImp {
             record.setHeight(uploadRequest.getHeight());
             record.setWeight(uploadRequest.getWeight());
             record.setMedicalHistory(uploadRequest.getMedicalHistory());
-            Optional<Doctor> doctor = doctorRepository.findById(1);
+            record.setCreateDate(originCreatedDate);
+            record.setUpdateDate(new Date());
+
+
+
             if (doctor.isPresent()) {
                 record.setDoctor(doctor.get());
             }
-            recordRepository.save(record);
+
+            listRecordSave.add(record);
 //
 //            Image image1 = imageRepository.findByUrl(url);
 //            int idImage = image1.getId();
 //            return new ImageDTO(idImage, url, uploadRequest.getName(), uploadRequest.getLocation(),
 //                    uploadRequest.getDescription(), originCreatedDate, updateDate);
         }
+
+        recordRepository.saveAll(listRecordSave);
+
+        Record recordPhone = recordRepository.findTopByPhone(uploadRequest.getPhone());
+        if(recordPhone != null){
+//            System.out.println(recordPhone.toString());
+//            System.out.println("phone" + " " + " " + recordPhone.getPhone());
+//            System.out.println(recordPhone.getId());
+            List<ImageAlbum> imageAlbumValue = imageAlbumRepository.findImageAlbumsByRecordId(recordPhone.getId());
+//            System.out.print(imageAlbumValue);
+//            System.out.println("hello album balue");
+            if(imageAlbumValue.size() == 0){
+//                System.out.println("ehllo HMD");
+                Album album = new Album();
+                album.setDoctor(doctor.get());
+                album.setName(uploadRequest.getPhone());
+                album.setCreateDate(new Date());
+                album.setUpdateDate(new Date());
+                albumRepository.save(album);
+
+                List<ImageAlbum> imageAlbumList = new ArrayList<>();
+                Album albumCreate = albumRepository.findByName(uploadRequest.getPhone());
+
+                for(String url : urls){
+                    Record record = recordRepository.findByUrl(url);
+                    ImageAlbum imageAlbum = new ImageAlbum();
+                    Record recordItem = recordRepository.findByUrl(url);
+                    KeyImageAlbum keyImageAlbum = new KeyImageAlbum(albumCreate.getId(), recordItem.getId());
+                    imageAlbum.setKeyImageAlbum(keyImageAlbum);
+                    imageAlbumList.add(imageAlbum);
+                }
+                imageAlbumRepository.saveAll(imageAlbumList);
+            } else {
+                List<ImageAlbum> imageAlbumList = new ArrayList<>();
+                Album albumCreate = albumRepository.findByName(uploadRequest.getPhone());
+
+                for(String url : urls){
+                    Record record = recordRepository.findByUrl(url);
+                    ImageAlbum imageAlbum = new ImageAlbum();
+                    Record recordItem = recordRepository.findByUrl(url);
+                    KeyImageAlbum keyImageAlbum = new KeyImageAlbum(albumCreate.getId(), recordItem.getId());
+                    imageAlbum.setKeyImageAlbum(keyImageAlbum);
+                    imageAlbumList.add(imageAlbum);
+                }
+                imageAlbumRepository.saveAll(imageAlbumList);
+            }
+        }
+//        if(recordPhone == null){
+//
+//
+//
+//        }
+
         return null;
     }
 
