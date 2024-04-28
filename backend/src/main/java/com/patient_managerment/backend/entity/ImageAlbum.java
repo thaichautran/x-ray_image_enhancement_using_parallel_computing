@@ -1,13 +1,13 @@
 package com.patient_managerment.backend.entity;
 
-import com.patient_managerment.backend.entity.key.KeyImageRecord;
+import com.patient_managerment.backend.entity.key.KeyImageAlbum;
 import jakarta.persistence.*;
 
 @Entity
 @Table(name = "image_record")
-public class ImageRecord {
+public class ImageAlbum {
     @EmbeddedId
-    KeyImageRecord keyImageRecord;
+    KeyImageAlbum keyImageAlbum;
     @ManyToOne
     @JoinColumn(name = "album_id", insertable = false, updatable = false)
     private Album album;
@@ -16,13 +16,15 @@ public class ImageRecord {
     @JoinColumn(name = "record_id", insertable = false, updatable = false)
     private Record record;
 
-    public KeyImageRecord getKeyImageRecord() {
-        return keyImageRecord;
+    public KeyImageAlbum getKeyImageAlbum() {
+        return keyImageAlbum;
     }
 
-    public void setKeyImageRecord(KeyImageRecord keyImageRecord) {
-        this.keyImageRecord = keyImageRecord;
+    public void setKeyImageAlbum(KeyImageAlbum keyImageAlbum) {
+        this.keyImageAlbum = keyImageAlbum;
     }
+
+
 
     public Album getAlbum() {
         return album;

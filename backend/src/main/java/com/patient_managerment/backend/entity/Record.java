@@ -63,7 +63,7 @@ public class Record {
     private Doctor doctor;
 
     @OneToMany(mappedBy = "record")
-    List<ImageRecord> imageRecordList;
+    List<ImageAlbum> imageRecordList;
 
 
     public int getId() {
@@ -197,11 +197,11 @@ public class Record {
         this.doctor = doctor;
     }
 
-    public List<ImageRecord> getImageRecordList() {
+    public List<ImageAlbum> getImageRecordList() {
         return imageRecordList;
     }
 
-    public void setImageRecordList(List<ImageRecord> imageRecordList) {
+    public void setImageRecordList(List<ImageAlbum> imageRecordList) {
         this.imageRecordList = imageRecordList;
     }
 }

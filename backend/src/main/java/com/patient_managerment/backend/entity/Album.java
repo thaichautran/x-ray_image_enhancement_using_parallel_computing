@@ -16,8 +16,7 @@ public class Album {
     @Column(name = "name")
     private String name;
 
-    @Column(name = "doctor_note")
-    private String doctorNote;
+
 
     @CreationTimestamp
     @Column(name = "create_date", nullable = false, updatable = false)
@@ -36,7 +35,9 @@ public class Album {
     private Doctor doctor;
 
     @OneToMany(mappedBy = "album")
-    List<ImageRecord> imageRecordList;
+    List<ImageAlbum> imageRecordList;
+
+
 
     public int getId() {
         return id;
@@ -54,13 +55,7 @@ public class Album {
         this.name = name;
     }
 
-    public String getDoctorNote() {
-        return doctorNote;
-    }
 
-    public void setDoctorNote(String doctorNote) {
-        this.doctorNote = doctorNote;
-    }
 
     public Date getCreateDate() {
         return createDate;
@@ -94,11 +89,11 @@ public class Album {
         this.doctor = doctor;
     }
 
-    public List<ImageRecord> getImageRecordList() {
+    public List<ImageAlbum> getImageRecordList() {
         return imageRecordList;
     }
 
-    public void setImageRecordList(List<ImageRecord> imageRecordList) {
+    public void setImageRecordList(List<ImageAlbum> imageRecordList) {
         this.imageRecordList = imageRecordList;
     }
 }
