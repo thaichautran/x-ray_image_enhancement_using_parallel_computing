@@ -67,4 +67,30 @@ public class AlbumService implements AlbumServiceImp {
         }
         return albumDTOList;
     }
+
+    @Override
+    public ImageDTO checkInfor(String phoneNumber) {
+        Album album = albumRepository.findByName(phoneNumber);
+        if(album != null){
+            int albumId = album.getId();
+            List<ImageAlbum> imageAlbumList = imageAlbumRepository.findByAlbumId(albumId);
+            ImageDTO imageDTO = new ImageDTO();
+            if(imageAlbumList != null && imageAlbumList.size() > 0) {
+                Record existedRecord = imageAlbumList.get(0).getRecord();
+                imageDTO.setMark(existedRecord.isMark());
+                imageDTO.setName(existedRecord.getName());
+                imageDTO.setAddress(existedRecord.getAddress());
+                imageDTO.setBirthday(existedRecord.getBirthday());
+                imageDTO.setPhone(existedRecord.getPhone());
+                imageDTO.setHeight(existedRecord.getHeight());
+                imageDTO.setWeight(existedRecord.getWeight());
+                imageDTO.setCreateDate(existedRecord.getCreateDate());
+                imageDTO.setUpdateDate(existedRecord.getUpdateDate());
+                imageDTO.setMedicalHistory(existedRecord.getMedicalHistory());
+                imageDTO.setDoctorNote(existedRecord.getDoctorNote());
+            }
+            return imageDTO;
+        }
+        return null;
+    }
 }

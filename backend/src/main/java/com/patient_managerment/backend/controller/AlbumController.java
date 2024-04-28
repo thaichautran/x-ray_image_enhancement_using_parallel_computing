@@ -7,6 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -19,6 +20,14 @@ public class AlbumController {
         RespondData respondData = new RespondData();
         respondData.setData(albumServiceImp.getAlbums());
         respondData.setDesc("Get list albums successfully!");
+        return new ResponseEntity<>(respondData, HttpStatus.OK);
+    }
+
+    @GetMapping("/check_infor")
+    public ResponseEntity<?> checkInfor(@RequestParam String phoneNumber){
+        RespondData respondData = new RespondData();
+        respondData.setData(albumServiceImp.checkInfor(phoneNumber));
+        respondData.setDesc("Get infor successfully!");
         return new ResponseEntity<>(respondData, HttpStatus.OK);
     }
 }
