@@ -1,11 +1,15 @@
 import numpy as np
-import cv2 # type: ignore
+import cv2
+import os
+import time
+import matplotlib.pyplot as plt
+from skimage import io
 
 from collections import OrderedDict
 
-window_size = 128
-clip_limit = 100
-n_iter = 1
+# window_size = 128
+# clip_limit = 100
+# n_iter = 1
 
 # Chuẩn hóa lại val theo khoảng giá trị mới
 def normalize(min_old, max_old, min_new, max_new, val):
@@ -33,151 +37,178 @@ def to_grayscale(image):
 
 	return image.astype(np.uint8)
 
-# Trả về mảng value là tần suất và mảng key là các pixel
-def histogram(data):
-	'''Generates the histogram for the given data.
+#INTERPOLATION FUNCTION
+def interpolate(subBin,LU,RU,LB,RB,subX,subY):
+    subImage = np.zeros(subBin.shape)
+    num = subX*subY
+    for i in range(subX):
+        inverseI = subX-i
+        for j in range(subY):
+            inverseJ = subY-j
+            val = subBin[i,j].astype(int)
+            subImage[i,j] = np.floor((inverseI*(inverseJ*LU[val] + j*RU[val])+ i*(inverseJ*LB[val] + j*RB[val]))/float(num))
+    return subImage
 
-	Parameters:
-		data: data to make the histogram.
+#CLAHE FUNCTION
+#ALL UTILITY FUNCTIONS COMBINED INTO ONE FUNCTION
+def clahe(img,clipLimit):
+    '''img - Input image
+       clipLimit - Normalized clipLimit. Higher value gives more contrast
+       nrBins - Number of graylevel bins for histogram("dynamic range")
+       nrX - Number of contextual regions in X direction
+       nrY - Number of contextual regions in Y direction'''
+    if clipLimit==1:
+        return
 
-	Returns: histogram, bins.
-	'''
-
-	# Trích xuất các giá trị duy nhất từ dữ liệu và số lần xuất hiện tương ứng của mỗi giá trị.
-	pixels, count = np.unique(data, return_counts=True)
-	# Tạo 1 từ điển (Gần giống Map, nhưng từ điển thì được xếp theo thứ tự).
-	hist = OrderedDict()
-
-	# Xếp các pixel khác nhau theo thứ tự từ pixels[0] đến hết vào hist.
-	for i in range(len(pixels)):
-		hist[pixels[i]] = count[i]
-
-	# Trả về mảng value và mảng key.
-	return np.array(list(hist.values())), np.array(list(hist.keys()))
-
-# Trả lại mảng tích lũy thu được từ hist.
-def calculate_cdf(hist, bins):
-	'''Calculates the normalized CDF (Cumulative Distribution Function)
-	for the histogram.
-
-	Parameters:
-		hist: frequencies of each pixel.
-		bins: pixels.
-
-	Returns the CDF in a dictionary.
-	'''
-
-	# Calculating probability for each pixel
-	# Trả về mảng lưu tần suất (0 đến 1) mỗi pixel trong mảng
-	pixel_probability = hist / hist.sum()
-	# Calculating the CDF (Cumulative Distribution Function)
-	# Hàm tích lũy
-	cdf = np.cumsum(pixel_probability)
-
-	# Nhân 255 để có được giá trị của pixel
-	cdf_normalized = cdf * 255
-
-	# Trả lại mảng tích lũy
-	hist_eq = {}
-	for i in range(len(cdf)):
-		hist_eq[bins[i]] = int(cdf_normalized[i])
-
-	return hist_eq
-
-# Trả về hist đã được cắt và phân phối lại
-def clip_histogram(hist, bins, clip_limit):
-	'''Clips the given histogram.
-
-	Parameters:
-		hist: frequencies of each pixel.
-		bins: pixels.
-		clip_limit: limit to pixel frequencies.
-
-	Returns the clipped hist.
-	'''
-
-	n_bins = len(bins)
-
-	# Removing values above clip_limit
-	# excess là số pixel vượt quá và bị cắt bỏ.
-	excess = 0
-	for i in range(n_bins):
-		if hist[i] > clip_limit:
-			excess += hist[i] - clip_limit
-			hist[i] = clip_limit
-
-	# Phân phối lại số pixel bị cắt bỏ
-	## Redistributing exceding values ##
-	# Calculating the values to be put on all bins
-	for_each_bin = excess // n_bins
-	# Calculating the values left
-	leftover = excess % n_bins
-
-	hist += for_each_bin
-	for i in range(leftover):
-		hist[i] += 1
-
-	return hist
-
-# Trả lại mảng tích lũy thu được từ hist sau khi cắt và phân phối lại.
-def clipped_histogram_equalization(region):
-    global clip_limit, n_iter
-    '''Calculates the clipped histogram equalization for the given region.
-
-    Parameters:
-        region: array-like.
-
-    Returns a dictionary with the CDF for each pixel in the region.
-    '''
-
-    # Building the histogram
-    # excess là số pixel vượt quá và bị cắt bỏ.
-    hist, bins = histogram(region)
-
-    # hist = clip_histogram(hist=hist, bins=bins, clip_limit=self.clip_limit)
+    h, w = img.shape
+    nrBins = 256
+    #Taking dimensions of each contextial region to be a square of 32X32
+    xsz = 32
+    ysz = 32
+    nrX = np.ceil(h/xsz).astype(int)#240
+    nrY = np.ceil(w/ysz).astype(int)#320
+    #Excess number of pixels to get an integer value of nrX and nrY
+    excX= int(xsz*(nrX-h/xsz))
+    excY= int(ysz*(nrY-w/ysz))
+    #Pad that number of pixels to the image
+    if excX!=0:
+        img = np.append(img,np.zeros((excX,img.shape[1])).astype(int),axis=0)
+    if excY!=0:
+        img = np.append(img,np.zeros((img.shape[0],excY)).astype(int),axis=1)
     
-    # Clipping the histogram
-    clipped_hist = clip_histogram(hist=hist, bins=bins, clip_limit=clip_limit)
-    # Trying to reduce the values above clipping
-    for _ in range(n_iter):
-        clipped_hist = clip_histogram(hist, bins, clip_limit)
+    nrPixels = xsz*ysz
+    # xsz2 = round(xsz/2)
+    # ysz2 = round(ysz/2)
+    clahe_img = np.zeros(img.shape)
+    
+    if clipLimit > 0:
+        clipLimit = max(1,clipLimit*xsz*ysz/nrBins)
+    else:
+        clipLimit = 50
+    
+    #makeLUT
+    print("...Make the LUT...")
+    minVal = 0 #np.min(img)
+    maxVal = 255 #np.max(img)
+    
+    #maxVal1 = maxVal + np.maximum(np.array([0]),minVal) - minVal
+    #minVal1 = np.maximum(np.array([0]),minVal)
+    
+    binSz = np.floor(1+(maxVal-minVal)/float(nrBins))
+    LUT = np.floor((np.arange(minVal,maxVal+1)-minVal)/float(binSz))
+    
+    #BACK TO CLAHE
+    bins = LUT[img]
+    print(bins.shape)
+    #makeHistogram
+    print("...Making the Histogram...")
+    hist = np.zeros((nrX,nrY,nrBins))
+    print(nrX,nrY,hist.shape)
+    for i in range(nrX):
+        for j in range(nrY):
+            bin_ = bins[i*xsz:(i+1)*xsz,j*ysz:(j+1)*ysz].astype(int)
+            for i1 in range(xsz):
+                for j1 in range(ysz):
+                    hist[i,j,bin_[i1,j1]]+=1
+    
+    #clipHistogram
+    print("...Clipping the Histogram...")
+    if clipLimit>0:
+        for i in range(nrX):
+            for j in range(nrY):
+                nrExcess = 0
+                for nr in range(nrBins):
+                    excess = hist[i,j,nr] - clipLimit
+                    if excess>0:
+                        nrExcess += excess
+                
+                binIncr = nrExcess/nrBins
+                upper = clipLimit - binIncr
+                for nr in range(nrBins):
+                    if hist[i,j,nr] > clipLimit:
+                        hist[i,j,nr] = clipLimit
+                    else:
+                        if hist[i,j,nr]>upper:
+                            nrExcess += upper - hist[i,j,nr]
+                            hist[i,j,nr] = clipLimit
+                        else:
+                            nrExcess -= binIncr
+                            hist[i,j,nr] += binIncr
+                
+                if nrExcess > 0:
+                    stepSz = max(1,np.floor(1+nrExcess/nrBins))
+                    for nr in range(nrBins):
+                        nrExcess -= stepSz
+                        hist[i,j,nr] += stepSz
+                        if nrExcess < 1:
+                            break
+    
+    #mapHistogram
+    print("...Mapping the Histogram...")
+    map_ = np.zeros((nrX,nrY,nrBins))
+    #print(map_.shape)
+    scale = (maxVal - minVal)/float(nrPixels)
+    for i in range(nrX):
+        for j in range(nrY):
+            sum_ = 0
+            for nr in range(nrBins):
+                sum_ += hist[i,j,nr]
+                map_[i,j,nr] = np.floor(min(minVal+sum_*scale,maxVal))
+    
+    #BACK TO CLAHE
+    #INTERPOLATION
+    print("...interpolation...")
+    xI = 0
+    for i in range(nrX+1):
+        if i==0:
+            subX = int(xsz/2)
+            xU = 0
+            xB = 0
+        elif i==nrX:
+            subX = int(xsz/2)
+            xU = nrX-1
+            xB = nrX-1
+        else:
+            subX = xsz
+            xU = i-1
+            xB = i
         
-    cdf = calculate_cdf(hist=clipped_hist, bins=bins)
+        yI = 0
+        for j in range(nrY+1):
+            if j==0:
+                subY = int(ysz/2)
+                yL = 0
+                yR = 0
+            elif j==nrY:
+                subY = int(ysz/2)
+                yL = nrY-1
+                yR = nrY-1
+            else:
+                subY = ysz
+                yL = j-1
+                yR = j
+            UL = map_[xU,yL,:]
+            UR = map_[xU,yR,:]
+            BL = map_[xB,yL,:]
+            BR = map_[xB,yR,:]
+            #print("CLAHE vals...")
+            subBin = bins[xI:xI+subX,yI:yI+subY]
+            #print("clahe subBin shape: ",subBin.shape)
+            subImage = interpolate(subBin,UL,UR,BL,BR,subX,subY)
+            clahe_img[xI:xI+subX,yI:yI+subY] = subImage
+            yI += subY
+        xI += subX
+    
+    if excX==0 and excY!=0:
+        return clahe_img[:,:-excY]
+    elif excX!=0 and excY==0:
+        return clahe_img[:-excX,:]
+    elif excX!=0 and excY!=0:
+        return clahe_img[:-excX,:-excY]
+    else:
+        return clahe_img
 
-    return cdf
-
-def clahe(image):
-    global window_size
-    '''Applies the CLAHE algorithm in an image.
-
-    Parameters:
-        image: image to be processed.
-
-    Returns a processed image.
-    '''
-
-    border = window_size // 2
-
-    padded_image = np.pad(image, border, "reflect")
-    shape = padded_image.shape
-    padded_equalized_image = np.zeros(shape).astype(np.uint8)
-
-    for i in range(border, shape[0] - border):
-        if i % 50 == 0:
-            print(f"Line: {i}")
-        for j in range(border, shape[1] - border):
-            # Region to extract the histogram
-            region = padded_image[i-border:i+border+1, j-border:j+border+1]
-            cdf = clipped_histogram_equalization(region)
-            # Changing the value of the image to the result from the CDF for the given pixel
-            padded_equalized_image[i][j] = cdf[padded_image[i][j]]
-
-    # Removing the padding from the image
-    equalized_image = padded_equalized_image[border:shape[0] - border, border:shape[1] - border].astype(np.uint8)
-
-    return equalized_image
-
-def run(images):
+def run(images, clip_limit):
     processed_images = []
     for image in images:
         if len(image.shape) > 2:
@@ -196,8 +227,33 @@ def run(images):
 
         normalized_image = normalize(np.min(resized_image), np.max(resized_image), 0, 255, resized_image)
 
-        equalized_image = clahe(normalized_image)
+        equalized_image = clahe(img=normalized_image, clipLimit=clip_limit)
         processed_images.append(equalized_image)
 
     return processed_images
 
+# Đọc và trả về danh sách ảnh theo đường dẫn
+def read_images_from_fraction_directory(dir_path): 
+    images = []
+
+    # Duyệt qua tất cả các tệp trong thư mục fraction
+    for filename in os.listdir(dir_path):
+        filepath = os.path.join(dir_path, filename)
+        # Kiểm tra xem tệp có phải là một tệp ảnh không
+        if os.path.isfile(filepath) and any(filename.endswith(ext) for ext in ['.jpg', '.jpeg', '.png']):
+            # Đọc ảnh bằng OpenCV
+            image = cv2.imread(filepath)
+            # Thêm ảnh vào danh sách nếu đọc thành công
+            if image is not None:
+                images.append(image)
+
+    return images
+
+fraction_dir = "data/fraction/images"  # Đường dẫn đến thư mục fraction
+# Sử dụng hàm để đọc ảnh từ thư mục fraction
+images = read_images_from_fraction_directory(fraction_dir)
+# Đo thời gian chạy của hàm gốc
+start_time = time.time()
+processed_images = run(images=images, clip_limit=8)
+end_time = time.time()
+print("Execution time of sum_array:", end_time - start_time)
