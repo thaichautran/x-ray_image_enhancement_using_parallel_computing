@@ -70,8 +70,17 @@ modify column mark boolean;
 alter table record 
 add column doctor_note text;
 
+alter table album 
+drop column doctor_note;
+
 INSERT INTO doctor (name, sex, address, birthday) VALUES ('Nguyen Van A', 'Male', '12A Tran Hung Dao, Ha Noi', '1990-01-01');
 select * from doctor;
+select * from record;
+select * from album;
+select * from image_record;
+delete from album where id >= 1;
+DELETE FROM record WHERE id = 45 or id = 46;
+DELETE FROM image_record WHERE album_id >= 1;
 
 
 
