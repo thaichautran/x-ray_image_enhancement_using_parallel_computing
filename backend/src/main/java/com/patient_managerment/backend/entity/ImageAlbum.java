@@ -24,6 +24,8 @@ public class ImageAlbum {
         this.keyImageAlbum = keyImageAlbum;
     }
 
+
+
     public Album getAlbum() {
         return album;
     }

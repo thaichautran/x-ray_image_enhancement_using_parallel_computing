@@ -25,6 +25,9 @@ public class ImageDTO {
     private String medicalHistory;
 
     private String doctorNote;
+    public ImageDTO() {
+
+    }
 
     public ImageDTO(String url, boolean mark, String name, String sex, String address, String birthday, String phone, double weight, double height, Date createDate, Date updateDate, String medicalHistory, String doctorNote) {
         this.url = url;

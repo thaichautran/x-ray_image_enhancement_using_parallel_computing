@@ -8,15 +8,15 @@ public class KeyImageAlbum implements Serializable {
     private int albumId;
 
     @Column(name = "record_id")
-    private int recordId;
+    private int imageId;
 
     public KeyImageAlbum() {
 
     }
 
-    public KeyImageAlbum(int albumId, int recordId) {
+    public KeyImageAlbum(int albumId, int imageId) {
         this.albumId = albumId;
-        this.recordId = recordId;
+        this.imageId = imageId;
     }
 
     public int getAlbumId() {
@@ -27,11 +27,11 @@ public class KeyImageAlbum implements Serializable {
         this.albumId = albumId;
     }
 
-    public int getRecordId() {
-        return recordId;
+    public int getImageId() {
+        return imageId;
     }
 
-    public void setRecordId(int recordId) {
-        this.recordId = recordId;
+    public void setImageId(int imageId) {
+        this.imageId = imageId;
     }
 }
