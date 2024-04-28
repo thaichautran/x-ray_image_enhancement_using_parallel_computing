@@ -3,7 +3,6 @@ import Footer from "./TheFooter";
 import Header from "./TheHeader";
 import { UserOutlined, StarOutlined } from "@ant-design/icons";
 import { Breadcrumb, Layout, Menu, Button, theme, Spin } from "antd";
-import { getCategories } from "../../apis/Categories";
 import { useNavigate, Link } from "react-router-dom";
 import LogoIcon from "../../assets/images/logo.svg";
 export default function AppBar({ children }) {

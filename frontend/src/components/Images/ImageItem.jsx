@@ -4,7 +4,7 @@ import { Button, Col, Modal } from "antd";
 import ImageModal from "../Modals/ImageModal";
 import { ThunderboltOutlined, StarOutlined } from "@ant-design/icons";
 import "../../assets/scss/components/ImageItem.scss";
-export default function ImageItem({ image }) {
+export default function ImageItem({ image, imageList }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const showModal = () => {
     setIsModalOpen(true);
@@ -24,7 +24,7 @@ export default function ImageItem({ image }) {
         }}
         style={{ cursor: "pointer" }}
       >
-        <img className="image" src={image.image_url} alt={image.patient_name} />
+        <img className="image" src={image.url} alt={image.name} />
       </Col>
 
       <Modal
@@ -54,7 +54,11 @@ export default function ImageItem({ image }) {
           </div>
         }
       >
-        <ImageModal image={image} onCancel={handleCancel}></ImageModal>
+        <ImageModal
+          image={image}
+          imageList={imageList}
+          onCancel={handleCancel}
+        ></ImageModal>
       </Modal>
     </div>
   );

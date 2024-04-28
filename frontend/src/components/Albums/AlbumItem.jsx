@@ -12,21 +12,21 @@ export default function AlbumItem({ album }) {
       <Col
         onClick={() => {
           navigate(`/album/${album.name}`, {
-            state: { imageList: album.imageList },
+            state: { imageList: album.imageDTOList },
           });
         }}
         style={{ cursor: "pointer" }}
       >
         <img
           className="image album-cover"
-          src={album.cover_photo}
+          src={album.imageDTOList[0].url}
           alt={album.name}
         />
         <div className="image-info">
           <p style={{ fontSize: "1rem", fontWeight: "600" }}>
-            BN - {album.name}
+            BN - {album.imageDTOList[0].name}
           </p>
-          <p>{album.imageList.length} ảnh</p>
+          <p>{album.imageDTOList.length} ảnh</p>
         </div>
       </Col>
     </div>

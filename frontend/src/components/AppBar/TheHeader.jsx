@@ -10,7 +10,7 @@ import {
 import { Button, Input, Avatar, Dropdown, Space, message, Modal } from "antd";
 import { Header } from "antd/es/layout/layout";
 import { useNavigate } from "react-router-dom";
-import { searchDocuments } from "../../apis/Documents";
+
 import UploadModal from "../Modals/UploadModal";
 export default function TheHeader({
   setCollapse,
@@ -22,56 +22,46 @@ export default function TheHeader({
   const [documentList, setDocumentList] = useState([]);
   const [keySearch, setKeySearch] = useState("");
   const [isBlur, setIsBlur] = useState(false);
-  //Modal
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const showModal = () => {
-    setIsModalOpen(true);
-  };
-  const handleOk = () => {
-    setIsModalOpen(false);
-  };
-  const handleCancel = () => {
-    setIsModalOpen(false);
-  };
+
   let timer = null;
   const debounce = (callback) => {
     if (timer) clearTimeout(timer);
     timer = setTimeout(() => callback(), 500);
   };
-  useEffect(() => {
-    searchDocuments(keySearch)
-      .then((res) => {
-        let result = res.data;
-        result = result.map((doc) => {
-          if (doc.name) {
-            return doc.name;
-          }
-          return doc.file_name;
-        });
-        setDocumentList([...new Set(result)]);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-    // if (keySearch) {
-    //   setTimeout(() => {
-    //     searchDocuments(keySearch)
-    //       .then((res) => {
-    //         let result = res.data;
-    //         result = result.map((doc) => {
-    //           if (doc.name) {
-    //             return doc.name;
-    //           }
-    //           return doc.file_name;
-    //         });
-    //         setDocumentList([...new Set(result)]);
-    //       })
-    //       .catch((err) => {
-    //         message.error("Không tìm thấy tài liệu nào!");
-    //       });
-    //   }, 300);
-    // }
-  }, [keySearch]);
+  // useEffect(() => {
+  //   searchDocuments(keySearch)
+  //     .then((res) => {
+  //       let result = res.data;
+  //       result = result.map((doc) => {
+  //         if (doc.name) {
+  //           return doc.name;
+  //         }
+  //         return doc.file_name;
+  //       });
+  //       setDocumentList([...new Set(result)]);
+  //     })
+  //     .catch((err) => {
+  //       console.log(err);
+  //     });
+  // if (keySearch) {
+  //   setTimeout(() => {
+  //     searchDocuments(keySearch)
+  //       .then((res) => {
+  //         let result = res.data;
+  //         result = result.map((doc) => {
+  //           if (doc.name) {
+  //             return doc.name;
+  //           }
+  //           return doc.file_name;
+  //         });
+  //         setDocumentList([...new Set(result)]);
+  //       })
+  //       .catch((err) => {
+  //         message.error("Không tìm thấy tài liệu nào!");
+  //       });
+  //   }, 300);
+  // }
+  // }, [keySearch]);
 
   const onSearch = async (value) => {};
 
@@ -178,23 +168,7 @@ export default function TheHeader({
             alignItems: "center",
           }}
         >
-          <Button onClick={showModal} style={{ marginRight: "1rem" }}>
-            <UploadOutlined />
-            Tải lên
-          </Button>
-
-          <Modal
-            title={<h2>Tải lên ảnh X-quang</h2>}
-            open={isModalOpen}
-            onOk={handleOk}
-            onCancel={handleCancel}
-            width={1000}
-            okText="Tải lên"
-            okButtonProps={{ style: { backgroundColor: "#00BDD6" } }}
-            cancelText="Hủy"
-          >
-            <UploadModal></UploadModal>
-          </Modal>
+          <UploadModal></UploadModal>
 
           <Space>
             <Avatar

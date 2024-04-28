@@ -6,7 +6,11 @@ export default function ImageList({ imageList }) {
     return imageList.map((image) => {
       return (
         <Col span={4}>
-          <ImageItem key={image.id} image={image}></ImageItem>
+          <ImageItem
+            key={image.phone}
+            imageList={imageList}
+            image={image}
+          ></ImageItem>
         </Col>
       );
     });

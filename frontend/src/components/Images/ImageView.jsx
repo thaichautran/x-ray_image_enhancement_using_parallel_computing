@@ -31,7 +31,7 @@ export default function ImageView({ imageList }) {
   const getCreatedDateList = async () => {
     let dates = [];
     imageList.forEach((image) => {
-      dates.push(image.create_date);
+      dates.push(image.createDate);
     });
     dates.sort();
     dates = dates.map((createdDate) => {
@@ -60,7 +60,7 @@ export default function ImageView({ imageList }) {
 
   const getImageListByDate = (date) => {
     return imageList.filter((image) => {
-      return formatDate(image.create_date) === date;
+      return formatDate(image.createDate) === date;
     });
   };
 
