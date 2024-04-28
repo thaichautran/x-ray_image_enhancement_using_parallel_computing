@@ -291,4 +291,50 @@ body {
 .logo-text {
   font-family: fontLogo;
   font-size: 20px;
+}
+
+.text-title {
+  color: #1c1c1c;
+  font-size: 30px;
+  font-weight: 700;
+}
+
+.text-sub-title {
+  color: #505050;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.text-sub-2-title {
+  color: #7a7a7a;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.text-sub-3-title {
+  color: #7a7a7a;
+  font-size: 14px;
+  font-weight: 300;
+}
+
+.text-link {
+  color: #0000ee;
+  font-size: 16px;
+  font-weight: 700;
+  text-decoration: underline;
+}
+.text-link:hover {
+  color: #505050;
+  cursor: pointer;
+}
+
+.list-item-hover {
+  transition: all 0.5s;
+}
+.list-item-hover:hover {
+  background-color: #696a6b;
+}
+
+.list-item-des-hover:hover {
+  color: white;
 }/*# sourceMappingURL=main.css.map */

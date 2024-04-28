@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import Footer from "./TheFooter";
 import Header from "./TheHeader";
-import { FolderOutlined } from "@ant-design/icons";
+import { UserOutlined, StarOutlined } from "@ant-design/icons";
 import { Breadcrumb, Layout, Menu, Button, theme, Spin } from "antd";
 import { getCategories } from "../../apis/Categories";
 import { useNavigate, Link } from "react-router-dom";
@@ -109,7 +109,26 @@ export default function AppBar({ children }) {
               padding: "0.75rem",
             }}
             onSelect={(props) => {}}
-          ></Menu>
+          >
+            <Menu.Item
+              key="1"
+              icon={<UserOutlined />}
+              onClick={() => {
+                navigate("/");
+              }}
+            >
+              Bệnh nhân
+            </Menu.Item>
+            <Menu.Item
+              key="2"
+              icon={<StarOutlined />}
+              onClick={() => {
+                navigate("/careful");
+              }}
+            >
+              Chú ý
+            </Menu.Item>
+          </Menu>
         </Sider>
         <Layout>
           <Header

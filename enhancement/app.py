@@ -1,6 +1,14 @@
 import numpy as np
 import cv2 # type: ignore
-
+import io
+from tkinter import Image
+from flask import Flask, request, jsonify
+import cv2
+import numpy as np
+import base64
+from PIL import Image
+import io
+import base64
 from collections import OrderedDict
 
 window_size = 128
@@ -201,3 +209,42 @@ def run(images):
 
     return processed_images
 
+
+app = Flask(__name__)
+
+@app.route('/')
+def home():
+    return "Hello, World!"
+
+@app.route('/convert', methods=['POST'])
+def convert_images():
+    if 'images' not in request.files:
+        return jsonify({'error': 'No images provided'}), 400
+    
+    images = request.files.getlist('images')
+    
+    try:
+        processed_images = []
+        for img_file in images:
+            # Đọc dữ liệu từ file ảnh và chuyển đổi thành mảng numpy
+            img_data = np.frombuffer(img_file.read(), np.uint8)
+            image = cv2.imdecode(img_data, cv2.IMREAD_COLOR)
+            processed_images.append(image)
+
+        processed_images = run(processed_images)
+        
+    except Exception as e:
+        return jsonify({'error': str(e)}), 400
+    
+    base64_images = []
+    for image in processed_images:
+        image_data = Image.fromarray(image)
+        buffer = io.BytesIO()
+        image_data.save(buffer, format='JPEG')
+        base64_image = base64.b64encode(buffer.getvalue()).decode('utf-8')
+        base64_images.append(base64_image)
+
+    return jsonify({'data': base64_images}), 200
+    
+if __name__ == '__main__':
+    app.run(debug=True)
