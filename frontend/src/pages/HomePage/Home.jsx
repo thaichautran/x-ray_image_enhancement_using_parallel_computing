@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from "react";
 import "../../assets/scss/pages/Home.scss";
-import imageList from "./test.json";
-import ImageView from "../../components/Images/ImageView";
-export default function Home() {
-  const [images, setImages] = useState(imageList);
 
+import AlbumView from "../../components/Albums/AlbumView";
+export default function Home() {
   return (
-    <div>
-      <ImageView imageList={imageList}></ImageView>
-    </div>
+    <section className="home-page">
+      <h1 style={{ fontSize: "2rem" }}>Hồ sơ bệnh nhân</h1>
+      <div>
+        <AlbumView></AlbumView>
+      </div>
+    </section>
   );
 }

@@ -2,12 +2,13 @@ import React, { useState, useEffect } from "react";
 import ImageList from "./ImageList";
 import dayjs from "dayjs";
 import "dayjs/locale/vi";
-
+import { LeftOutlined } from "@ant-design/icons";
+import { useNavigate } from "react-router";
 export default function ImageView({ imageList }) {
   const [createdDateList, setCreatedDateList] = useState([]);
   const [today, setToday] = useState(new Date());
   const [yesterday, setYesterday] = useState();
-
+  const navigate = useNavigate();
   useEffect(() => {
     getCreatedDateList();
     getToday();
@@ -30,7 +31,7 @@ export default function ImageView({ imageList }) {
   const getCreatedDateList = async () => {
     let dates = [];
     imageList.forEach((image) => {
-      dates.push(image.create_date);
+      dates.push(image.createDate);
     });
     dates.sort();
     dates = dates.map((createdDate) => {
@@ -59,7 +60,7 @@ export default function ImageView({ imageList }) {
 
   const getImageListByDate = (date) => {
     return imageList.filter((image) => {
-      return formatDate(image.create_date) === date;
+      return formatDate(image.createDate) === date;
     });
   };
 
@@ -69,6 +70,15 @@ export default function ImageView({ imageList }) {
 
   return (
     <section id="image-view">
+      <span
+        className="back"
+        onClick={() => navigate(-1)}
+        style={{ fontSize: "1.25rem" }}
+      >
+        <LeftOutlined />
+        Quay lại
+      </span>
+
       {imageList.length > 0 ? (
         <div className="image-view-gallery">
           {getYear(createdDateList).map((year) => (

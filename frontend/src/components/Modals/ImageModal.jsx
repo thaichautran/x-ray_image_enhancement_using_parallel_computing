@@ -14,6 +14,7 @@ import {
   List,
   Skeleton,
   Divider,
+  Slider,
 } from "antd";
 import {
   EllipsisOutlined,
@@ -31,9 +32,29 @@ import {
   StarFilled,
 } from "@ant-design/icons";
 import InfiniteScroll from "react-infinite-scroll-component";
-import imageList from "../../pages/HomePage/test.json";
+
 import dayjs from "dayjs";
-export default function ImageModal({ image, onCancel }) {
+export default function ImageModal({
+  image,
+  imageList,
+  onCancel,
+  enhancedImage,
+}) {
+  const calculateAge = (birthday) => {
+    const birthDate = new Date(birthday);
+    console.log(birthDate);
+    const currentDate = new Date();
+    let age = currentDate.getFullYear() - birthDate.getFullYear();
+    const monthDiff = currentDate.getMonth() - birthDate.getMonth();
+    if (
+      monthDiff < 0 ||
+      (monthDiff === 0 && currentDate.getDate() < birthDate.getDate())
+    ) {
+      age--;
+    }
+
+    return age;
+  };
   const { TextArea } = Input;
   const [isEdit, setIsEdit] = useState(false);
   const [images, setImages] = useState([]);
@@ -41,15 +62,16 @@ export default function ImageModal({ image, onCancel }) {
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState([]);
   //user info
-  const [patientName, setPatientName] = useState(image.patient_name);
-  const [createDate, setCreateDate] = useState(image.create_date);
-  const [patientAddress, setPatientAddress] = useState(image.patient_address);
-  const [patientSex, setPatientSex] = useState(image.patient_sex);
-  const [patientAge, setPatientAge] = useState(image.patient_age);
-  const [medicaHistory, setMedicaHistory] = useState(image.medica_history);
-  const [note, setNote] = useState(image.note);
+  const [patientName, setPatientName] = useState(image.name);
+  const [createDate, setCreateDate] = useState(image.createDate);
+  const [patientAddress, setPatientAddress] = useState(image.address);
+  const [patientSex, setPatientSex] = useState(image.sex);
+  const [patientAge, setPatientAge] = useState(calculateAge(image.birthday));
+  const [medicaHistory, setMedicaHistory] = useState(image.medicalHistory);
+  const [doctorNote, setDoctorNote] = useState(image.doctorNote);
   const [mark, setMark] = useState(image.mark);
-  const [imageUrl, setImageUrl] = useState(image.image_url);
+  const [imageUrl, setImageUrl] = useState(image.url);
+  const [stepLimit, setStepLimit] = useState(4);
   const loadMoreData = () => {
     if (loading) {
       return;
@@ -60,20 +82,22 @@ export default function ImageModal({ image, onCancel }) {
     setLoading(false);
   };
   const setNewImage = (image) => {
-    setImageUrl(image.image_url);
-    setPatientName(image.patient_name);
-    setCreateDate(image.create_date);
-    setPatientAge(image.patient_age);
-    setPatientAddress(image.patient_address);
-    setPatientSex(image.patient_sex);
-    setMedicaHistory(image.medica_history);
-    setNote(image.note);
+    setImageUrl(image.url);
+    setPatientName(image.name);
+    setCreateDate(image.createDate);
+    setPatientAge(calculateAge(image.birthday));
+    setPatientAddress(image.address);
+    setPatientSex(image.sex);
+    setMedicaHistory(image.medicalHistory);
+    setDoctorNote(image.doctorNote);
     setMark(image.mark);
   };
+
   useEffect(() => {
-    setDefaultDate(dayjs(image.create_date).format("DD/MM/YYYY"));
+    setPatientAge(calculateAge(image.birthday));
+    setDefaultDate(dayjs(image.createDate).format("DD/MM/YYYY"));
     loadMoreData();
-    setImages(imageList.map((img) => img.image_url));
+    setImages(imageList.map((img) => img.url));
   }, []);
   //dropdown
   const items = [
@@ -114,20 +138,41 @@ export default function ImageModal({ image, onCancel }) {
       key: "3",
     },
   ];
-  //list
 
   return (
     <div className="image-model">
       <Row style={{ justifyContent: "space-between" }} gutter={16}>
+        {enhancedImage ? (
+          <Col span={12}>
+            <Image className="image" src={enhancedImage} alt={image.name} />
+            <Slider
+              style={{ width: "60%" }}
+              max={32}
+              min={4}
+              marks={{
+                4: "4",
+                8: "8",
+                16: "16",
+                32: "32",
+              }}
+              step={stepLimit * 2}
+              defaultValue={37}
+            />
+          </Col>
+        ) : null}
+
         <Col span={12}>
           <Image.PreviewGroup items={images}>
             <Image width={"100%"} src={imageUrl} />
           </Image.PreviewGroup>
           <h2>Ghi chú</h2>
           {isEdit ? (
-            <TextArea style={{ width: "100%" }} defaultValue={note}></TextArea>
+            <TextArea
+              style={{ width: "100%" }}
+              defaultValue={doctorNote}
+            ></TextArea>
           ) : (
-            <p>{note}</p>
+            <p>{doctorNote}</p>
           )}
         </Col>
         <Col span={12}>
@@ -294,7 +339,7 @@ export default function ImageModal({ image, onCancel }) {
               </Form.Item>
             </Form>
           ) : (
-            <div>
+            <div style={{ position: "relative" }}>
               <h1>{patientName}</h1>
               <Row>
                 <Col flex={1}>
@@ -310,95 +355,107 @@ export default function ImageModal({ image, onCancel }) {
                 <Col flex={1}>
                   <UserOutlined />
                   &nbsp;
-                  {patientSex} - {patientSex} tuổi
+                  {patientSex} - {patientAge} tuổi
                 </Col>
               </Row>
               <h2 style={{ marginBottom: 0 }}>Tiền sử bệnh nhân</h2>
               <p style={{ margin: 0 }}>{medicaHistory}</p>
-              <h2 style={{ marginBottom: 0 }}>Ảnh X-quang của bệnh nhân</h2>
               <div
-                id="scrollableDiv"
-                style={{
-                  height: 200,
-                  overflow: "auto",
-                  padding: "0 16px",
-                  border: "1px solid rgba(140, 140, 140, 0.35)",
-                }}
+                className="relevant-image"
+                style={
+                  enhancedImage
+                    ? {
+                        width: "80%",
+                        position: "absolute",
+                        right: "-90%",
+                        bottom: "0",
+                      }
+                    : {}
+                }
               >
-                <InfiniteScroll
-                  dataLength={data.length}
-                  endMessage={
-                    <Divider plain>It is all, nothing more 🤐</Divider>
-                  }
-                  scrollableTarget="scrollableDiv"
+                <h2 style={{ marginBottom: 0 }}>Ảnh X-quang của bệnh nhân</h2>
+                <div
+                  id="scrollableDiv"
+                  style={{
+                    height: 200,
+                    overflow: "auto",
+                    padding: "0 16px",
+                    border: "1px solid rgba(140, 140, 140, 0.35)",
+                  }}
                 >
-                  <List
-                    header={
-                      <div
-                        style={{
-                          display: "flex",
-                          justifyContent: "space-between",
-                          fontWeight: "bold",
-                        }}
-                      >
-                        <span></span>
-                        <span>Ngày giờ</span>
-                        <span>Ghi chú</span>
-                        <span>Lưu ý</span>
-                      </div>
+                  <InfiniteScroll
+                    dataLength={data.length}
+                    endMessage={
+                      <Divider plain>It is all, nothing more 🤐</Divider>
                     }
-                    dataSource={data}
-                    renderItem={(item) => (
-                      <div>
-                        <List.Item
-                          className="list-item-hover"
-                          key={item.id}
+                    scrollableTarget="scrollableDiv"
+                  >
+                    <List
+                      header={
+                        <div
                           style={{
-                            cursor: "pointer",
-                          }}
-                          onClick={() => {
-                            setNewImage(item);
+                            display: "flex",
+                            justifyContent: "space-between",
+                            fontWeight: "bold",
                           }}
                         >
-                          <List.Item.Meta
-                            avatar={
-                              <Avatar shape="square" src={item.image_url} />
-                            }
-                            description={
-                              <div
-                                className="list-item-des-hover"
-                                style={{
-                                  display: "flex",
-                                  justifyContent: "space-around",
-                                }}
-                              >
-                                <p style={{ width: "30%" }}>
-                                  {dayjs(item.create_date).format(
-                                    "HH[h]mm, DD/MM/YYYY"
-                                  )}
-                                </p>
-                                <p
+                          <span></span>
+                          <span>Ngày giờ</span>
+                          <span>Ghi chú</span>
+                          <span>Lưu ý</span>
+                        </div>
+                      }
+                      dataSource={data}
+                      renderItem={(item) => (
+                        <div>
+                          <List.Item
+                            className="list-item-hover"
+                            key={item.id}
+                            style={{
+                              cursor: "pointer",
+                            }}
+                            onClick={() => {
+                              setNewImage(item);
+                            }}
+                          >
+                            <List.Item.Meta
+                              avatar={<Avatar shape="square" src={item.url} />}
+                              description={
+                                <div
+                                  className="list-item-des-hover"
                                   style={{
-                                    width: "55%",
+                                    display: "flex",
+                                    justifyContent: "space-around",
                                   }}
                                 >
-                                  {item.note}
-                                </p>
-                              </div>
-                            }
-                          />
-                          <div>
-                            {mark ? (
-                              <StarFilled style={{ color: "yellow" }} />
-                            ) : (
-                              <StarOutlined />
-                            )}
-                          </div>
-                        </List.Item>
-                      </div>
-                    )}
-                  />
-                </InfiniteScroll>
+                                  <p style={{ width: "30%" }}>
+                                    {dayjs(item.createDate).format(
+                                      "HH[h]mm, DD/MM/YYYY"
+                                    )}
+                                  </p>
+                                  <p
+                                    style={{
+                                      width: "55%",
+                                    }}
+                                  >
+                                    {item.doctorNote}
+                                  </p>
+                                </div>
+                              }
+                            />
+                            <div>
+                              {mark ? (
+                                <StarFilled style={{ color: "yellow" }} />
+                              ) : (
+                                <StarOutlined />
+                              )}
+                            </div>
+                          </List.Item>
+                        </div>
+                      )}
+                    />
+                  </InfiniteScroll>
+                </div>
               </div>
             </div>
           )}

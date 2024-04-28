@@ -1,10 +1,12 @@
-import numpy as np
-import cv2
-import os
-import time
-import matplotlib.pyplot as plt
-from skimage import io
 
+import cv2 # type: ignore
+import io
+from tkinter import Image
+from flask import Flask, request, jsonify
+import numpy as np
+import base64
+from PIL import Image
+import matplotlib.pyplot as plt
 from collections import OrderedDict
 
 # window_size = 128
@@ -208,7 +210,7 @@ def clahe(img,clipLimit):
     else:
         return clahe_img
 
-def run(images, clip_limit):
+def run(images, clip_limit = 8):
     processed_images = []
     for image in images:
         if len(image.shape) > 2:
@@ -232,28 +234,44 @@ def run(images, clip_limit):
 
     return processed_images
 
-# Đọc và trả về danh sách ảnh theo đường dẫn
-def read_images_from_fraction_directory(dir_path): 
-    images = []
 
-    # Duyệt qua tất cả các tệp trong thư mục fraction
-    for filename in os.listdir(dir_path):
-        filepath = os.path.join(dir_path, filename)
-        # Kiểm tra xem tệp có phải là một tệp ảnh không
-        if os.path.isfile(filepath) and any(filename.endswith(ext) for ext in ['.jpg', '.jpeg', '.png']):
-            # Đọc ảnh bằng OpenCV
-            image = cv2.imread(filepath)
-            # Thêm ảnh vào danh sách nếu đọc thành công
-            if image is not None:
-                images.append(image)
+app = Flask(__name__)
 
-    return images
+@app.route('/')
+def home():
+    return "Hello, World!"
 
-fraction_dir = "data/fraction/images"  # Đường dẫn đến thư mục fraction
-# Sử dụng hàm để đọc ảnh từ thư mục fraction
-images = read_images_from_fraction_directory(fraction_dir)
-# Đo thời gian chạy của hàm gốc
-start_time = time.time()
-processed_images = run(images=images, clip_limit=8)
-end_time = time.time()
-print("Execution time of sum_array:", end_time - start_time)
+@app.route('/convert', methods=['POST'])
+def convert_images():
+    if 'images' not in request.files:
+        return jsonify({'error': 'No images provided'}), 400
+    
+    images = request.files.getlist('images')
+    clip_limit = float(request.form.get('clip_limit', 8))
+    
+    try:
+        processed_images = []
+        for img_file in images:
+            # Đọc dữ liệu từ file ảnh và chuyển đổi thành mảng numpy
+            img_data = np.frombuffer(img_file.read(), np.uint8)
+            image = cv2.imdecode(img_data, cv2.IMREAD_COLOR)
+            processed_images.append(image)
+
+        processed_images = run(processed_images, clip_limit)
+        
+    except Exception as e:
+        return jsonify({'error': str(e)}), 400
+    
+    base64_images = []
+    for image in processed_images:
+        image = image.astype(np.uint8)
+        image_data = Image.fromarray(image)
+        buffer = io.BytesIO()
+        image_data.save(buffer, format='JPEG')
+        base64_image = base64.b64encode(buffer.getvalue()).decode('utf-8')
+        base64_images.append(base64_image)
+
+    return jsonify({'data': base64_images}), 200
+    
+if __name__ == '__main__':
+    app.run(debug=True)
