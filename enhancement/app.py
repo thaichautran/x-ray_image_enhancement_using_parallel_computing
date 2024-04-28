@@ -6,10 +6,7 @@ from flask import Flask, request, jsonify
 import numpy as np
 import base64
 from PIL import Image
-import os
-import time
 import matplotlib.pyplot as plt
-from skimage import io
 from collections import OrderedDict
 
 # window_size = 128
@@ -213,7 +210,7 @@ def clahe(img,clipLimit):
     else:
         return clahe_img
 
-def run(images, clip_limit):
+def run(images, clip_limit = 8):
     processed_images = []
     for image in images:
         if len(image.shape) > 2:
@@ -250,6 +247,7 @@ def convert_images():
         return jsonify({'error': 'No images provided'}), 400
     
     images = request.files.getlist('images')
+    clip_limit = float(request.form.get('clip_limit', 8))
     
     try:
         processed_images = []
@@ -259,13 +257,14 @@ def convert_images():
             image = cv2.imdecode(img_data, cv2.IMREAD_COLOR)
             processed_images.append(image)
 
-        processed_images = run(processed_images)
+        processed_images = run(processed_images, clip_limit)
         
     except Exception as e:
         return jsonify({'error': str(e)}), 400
     
     base64_images = []
     for image in processed_images:
+        image = image.astype(np.uint8)
         image_data = Image.fromarray(image)
         buffer = io.BytesIO()
         image_data.save(buffer, format='JPEG')
