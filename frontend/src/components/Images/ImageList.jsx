@@ -7,7 +7,7 @@ export default function ImageList({ imageList }) {
       return (
         <Col span={4}>
           <ImageItem
-            key={image.phone}
+            key={image.imageId}
             imageList={imageList}
             image={image}
           ></ImageItem>

@@ -7,7 +7,7 @@ export default function AlbumList({ albumList }) {
     return albumList.map((album) => {
       return (
         <Col span={4}>
-          <AlbumItem key={album.name} album={album}></AlbumItem>
+          <AlbumItem key={album.albumId} album={album}></AlbumItem>
         </Col>
       );
     });

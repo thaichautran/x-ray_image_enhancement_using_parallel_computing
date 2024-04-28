@@ -4,8 +4,11 @@ import { Button, Col, Modal } from "antd";
 import ImageModal from "../Modals/ImageModal";
 import { ThunderboltOutlined, StarOutlined } from "@ant-design/icons";
 import "../../assets/scss/components/ImageItem.scss";
+import { enhanceImage } from "../../apis/image";
 export default function ImageItem({ image, imageList }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [enhancedImage, setEnhancedImage] = useState();
   const showModal = () => {
     setIsModalOpen(true);
   };
@@ -15,7 +18,23 @@ export default function ImageItem({ image, imageList }) {
   const handleCancel = () => {
     setIsModalOpen(false);
   };
+  const enhance = async () => {
+    setLoading(true);
 
+    let rqbody = {
+      image_urls: [image.url],
+      clip_lịmit: 8,
+    };
+    await enhanceImage(rqbody)
+      .then((res) => {
+        setEnhancedImage(res.data);
+        setLoading(false);
+      })
+      .catch((err) => {
+        console.log(err);
+        setLoading(false);
+      });
+  };
   return (
     <div id="image-item">
       <Col
@@ -47,7 +66,12 @@ export default function ImageItem({ image, imageList }) {
               <Button>
                 <StarOutlined /> Chú ý
               </Button>
-              <Button>
+              <Button
+                loading={loading}
+                onClick={() => {
+                  enhance();
+                }}
+              >
                 <ThunderboltOutlined /> Tăng cường ảnh
               </Button>
             </div>
@@ -55,6 +79,7 @@ export default function ImageItem({ image, imageList }) {
         }
       >
         <ImageModal
+          enhancedImage={enhancedImage}
           image={image}
           imageList={imageList}
           onCancel={handleCancel}

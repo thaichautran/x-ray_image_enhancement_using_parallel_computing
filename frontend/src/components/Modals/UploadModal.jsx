@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Row, Col, Select, Button, DatePicker, Form, Input, Modal } from "antd";
 import { PlusOutlined, UploadOutlined } from "@ant-design/icons";
 import { Image, Upload } from "antd";
+import dayjs from "dayjs";
 import { autoFill, uploadImage } from "../../apis/image";
 export default function UploadModal() {
   const { TextArea } = Input;
@@ -9,7 +10,6 @@ export default function UploadModal() {
   const [previewImage, setPreviewImage] = useState("");
   const [fileList, setFileList] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [keySearch, setKeySearch] = useState("");
   const [formState, setFormState] = useState({
     name: "",
     sex: "",
@@ -28,6 +28,17 @@ export default function UploadModal() {
   const handleOk = () => {};
   const handleCancel = () => {
     setIsModalOpen(false);
+    setFormState({
+      name: "",
+      sex: "",
+      phone: "",
+      address: "",
+      birthday: "",
+      height: "",
+      weight: "",
+      medicalHistory: "",
+    });
+    setFileList([]);
   };
 
   //Upload from device
@@ -50,21 +61,25 @@ export default function UploadModal() {
     return false;
   };
 
-  //autofill
-  let timer = null;
-  const debounce = (callback) => {
-    if (timer) clearTimeout(timer);
-    timer = setTimeout(() => callback(), 500);
+  const getToday = () => {
+    const today = new Date();
+    const day = String(today.getDate()).padStart(2, "0");
+    const month = String(today.getMonth() + 1).padStart(2, "0");
+    const year = today.getFullYear();
+    return `${day}/${month}/${year}`;
   };
-  useEffect(() => {
-    autoFill(keySearch)
+  //autofill
+  const autoFillForm = async () => {
+    await autoFill(formState.phone)
       .then((res) => {
         setFormState(res.data);
+        console.log(res.data);
+        console.log(formState);
       })
       .catch((err) => {
         console.log(err);
       });
-  }, [keySearch]);
+  };
 
   //upload
   const onFinish = async () => {
@@ -142,6 +157,7 @@ export default function UploadModal() {
                   }}
                 >
                   <Input
+                    value={formState.name}
                     onChange={(e) =>
                       setFormState({
                         ...formState,
@@ -160,6 +176,7 @@ export default function UploadModal() {
                   }}
                 >
                   <Select
+                    value={formState.sex}
                     onChange={(e) =>
                       setFormState({
                         ...formState,
@@ -186,18 +203,24 @@ export default function UploadModal() {
                   }}
                 >
                   <Input
+                    value={formState.phone}
                     onChange={(e) => {
                       setFormState({
                         ...formState,
                         phone: e.target.value,
                       });
-                      debounce(() => setKeySearch(e.target.value));
+                    }}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") {
+                        autoFillForm();
+                      }
                     }}
                   ></Input>
                 </Form.Item>
               </Form.Item>
               <Form.Item label="Địa chỉ" style={{ width: "calc(95% - 12px)" }}>
                 <Input
+                  value={formState.address}
                   onChange={(e) =>
                     setFormState({
                       ...formState,
@@ -215,6 +238,11 @@ export default function UploadModal() {
                   }}
                 >
                   <DatePicker
+                    value={
+                      formState.birthday
+                        ? dayjs(formState.birthday, "DD/MM/YYYY")
+                        : dayjs(getToday(), "DD/MM/YYYY")
+                    }
                     format="DD/MM/YYYY"
                     onChange={(e, v) => {
                       console.log(v);
@@ -236,6 +264,7 @@ export default function UploadModal() {
                   }}
                 >
                   <Input
+                    value={formState.height}
                     onChange={(e) =>
                       setFormState({
                         ...formState,
@@ -249,6 +278,7 @@ export default function UploadModal() {
                   style={{ display: "inline-block", width: "calc(30% - 12px)" }}
                 >
                   <Input
+                    value={formState.weight}
                     onChange={(e) =>
                       setFormState({
                         ...formState,
@@ -263,6 +293,7 @@ export default function UploadModal() {
                 style={{ display: "inline-block", width: "calc(95% - 12px)" }}
               >
                 <TextArea
+                  value={formState.medicalHistory}
                   style={{ height: "125px" }}
                   onChange={(e) =>
                     setFormState({
@@ -284,6 +315,7 @@ export default function UploadModal() {
               }}
             >
               <Upload
+                multiple={true}
                 listType="picture-card"
                 fileList={fileList}
                 onPreview={handlePreview}

@@ -14,6 +14,7 @@ import {
   List,
   Skeleton,
   Divider,
+  Slider,
 } from "antd";
 import {
   EllipsisOutlined,
@@ -33,7 +34,12 @@ import {
 import InfiniteScroll from "react-infinite-scroll-component";
 
 import dayjs from "dayjs";
-export default function ImageModal({ image, imageList, onCancel }) {
+export default function ImageModal({
+  image,
+  imageList,
+  onCancel,
+  enhancedImage,
+}) {
   const calculateAge = (birthday) => {
     const birthDate = new Date(birthday);
     console.log(birthDate);
@@ -65,6 +71,7 @@ export default function ImageModal({ image, imageList, onCancel }) {
   const [doctorNote, setDoctorNote] = useState(image.doctorNote);
   const [mark, setMark] = useState(image.mark);
   const [imageUrl, setImageUrl] = useState(image.url);
+  const [stepLimit, setStepLimit] = useState(4);
   const loadMoreData = () => {
     if (loading) {
       return;
@@ -131,11 +138,29 @@ export default function ImageModal({ image, imageList, onCancel }) {
       key: "3",
     },
   ];
-  //list
 
   return (
     <div className="image-model">
       <Row style={{ justifyContent: "space-between" }} gutter={16}>
+        {enhancedImage ? (
+          <Col span={12}>
+            <Image className="image" src={enhancedImage} alt={image.name} />
+            <Slider
+              style={{ width: "60%" }}
+              max={32}
+              min={4}
+              marks={{
+                4: "4",
+                8: "8",
+                16: "16",
+                32: "32",
+              }}
+              step={stepLimit * 2}
+              defaultValue={37}
+            />
+          </Col>
+        ) : null}
+
         <Col span={12}>
           <Image.PreviewGroup items={images}>
             <Image width={"100%"} src={imageUrl} />
@@ -314,7 +339,7 @@ export default function ImageModal({ image, imageList, onCancel }) {
               </Form.Item>
             </Form>
           ) : (
-            <div>
+            <div style={{ position: "relative" }}>
               <h1>{patientName}</h1>
               <Row>
                 <Col flex={1}>
@@ -335,88 +360,102 @@ export default function ImageModal({ image, imageList, onCancel }) {
               </Row>
               <h2 style={{ marginBottom: 0 }}>Tiền sử bệnh nhân</h2>
               <p style={{ margin: 0 }}>{medicaHistory}</p>
-              <h2 style={{ marginBottom: 0 }}>Ảnh X-quang của bệnh nhân</h2>
               <div
-                id="scrollableDiv"
-                style={{
-                  height: 200,
-                  overflow: "auto",
-                  padding: "0 16px",
-                  border: "1px solid rgba(140, 140, 140, 0.35)",
-                }}
+                className="relevant-image"
+                style={
+                  enhancedImage
+                    ? {
+                        width: "80%",
+                        position: "absolute",
+                        right: "-90%",
+                        bottom: "0",
+                      }
+                    : {}
+                }
               >
-                <InfiniteScroll
-                  dataLength={data.length}
-                  endMessage={
-                    <Divider plain>It is all, nothing more 🤐</Divider>
-                  }
-                  scrollableTarget="scrollableDiv"
+                <h2 style={{ marginBottom: 0 }}>Ảnh X-quang của bệnh nhân</h2>
+                <div
+                  id="scrollableDiv"
+                  style={{
+                    height: 200,
+                    overflow: "auto",
+                    padding: "0 16px",
+                    border: "1px solid rgba(140, 140, 140, 0.35)",
+                  }}
                 >
-                  <List
-                    header={
-                      <div
-                        style={{
-                          display: "flex",
-                          justifyContent: "space-between",
-                          fontWeight: "bold",
-                        }}
-                      >
-                        <span></span>
-                        <span>Ngày giờ</span>
-                        <span>Ghi chú</span>
-                        <span>Lưu ý</span>
-                      </div>
+                  <InfiniteScroll
+                    dataLength={data.length}
+                    endMessage={
+                      <Divider plain>It is all, nothing more 🤐</Divider>
                     }
-                    dataSource={data}
-                    renderItem={(item) => (
-                      <div>
-                        <List.Item
-                          className="list-item-hover"
-                          key={item.id}
+                    scrollableTarget="scrollableDiv"
+                  >
+                    <List
+                      header={
+                        <div
                           style={{
-                            cursor: "pointer",
-                          }}
-                          onClick={() => {
-                            setNewImage(item);
+                            display: "flex",
+                            justifyContent: "space-between",
+                            fontWeight: "bold",
                           }}
                         >
-                          <List.Item.Meta
-                            avatar={<Avatar shape="square" src={item.url} />}
-                            description={
-                              <div
-                                className="list-item-des-hover"
-                                style={{
-                                  display: "flex",
-                                  justifyContent: "space-around",
-                                }}
-                              >
-                                <p style={{ width: "30%" }}>
-                                  {dayjs(item.createDate).format(
-                                    "HH[h]mm, DD/MM/YYYY"
-                                  )}
-                                </p>
-                                <p
+                          <span></span>
+                          <span>Ngày giờ</span>
+                          <span>Ghi chú</span>
+                          <span>Lưu ý</span>
+                        </div>
+                      }
+                      dataSource={data}
+                      renderItem={(item) => (
+                        <div>
+                          <List.Item
+                            className="list-item-hover"
+                            key={item.id}
+                            style={{
+                              cursor: "pointer",
+                            }}
+                            onClick={() => {
+                              setNewImage(item);
+                            }}
+                          >
+                            <List.Item.Meta
+                              avatar={<Avatar shape="square" src={item.url} />}
+                              description={
+                                <div
+                                  className="list-item-des-hover"
                                   style={{
-                                    width: "55%",
+                                    display: "flex",
+                                    justifyContent: "space-around",
                                   }}
                                 >
-                                  {item.doctorNote}
-                                </p>
-                              </div>
-                            }
-                          />
-                          <div>
-                            {mark ? (
-                              <StarFilled style={{ color: "yellow" }} />
-                            ) : (
-                              <StarOutlined />
-                            )}
-                          </div>
-                        </List.Item>
-                      </div>
-                    )}
-                  />
-                </InfiniteScroll>
+                                  <p style={{ width: "30%" }}>
+                                    {dayjs(item.createDate).format(
+                                      "HH[h]mm, DD/MM/YYYY"
+                                    )}
+                                  </p>
+                                  <p
+                                    style={{
+                                      width: "55%",
+                                    }}
+                                  >
+                                    {item.doctorNote}
+                                  </p>
+                                </div>
+                              }
+                            />
+                            <div>
+                              {mark ? (
+                                <StarFilled style={{ color: "yellow" }} />
+                              ) : (
+                                <StarOutlined />
+                              )}
+                            </div>
+                          </List.Item>
+                        </div>
+                      )}
+                    />
+                  </InfiniteScroll>
+                </div>
               </div>
             </div>
           )}
