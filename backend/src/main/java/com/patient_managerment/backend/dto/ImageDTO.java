@@ -3,6 +3,7 @@ package com.patient_managerment.backend.dto;
 import java.util.Date;
 
 public class ImageDTO {
+    private int imageId;
     private String url;
     private boolean mark;
     private String name;
@@ -29,7 +30,8 @@ public class ImageDTO {
 
     }
 
-    public ImageDTO(String url, boolean mark, String name, String sex, String address, String birthday, String phone, double weight, double height, Date createDate, Date updateDate, String medicalHistory, String doctorNote) {
+    public ImageDTO(int id, String url, boolean mark, String name, String sex, String address, String birthday, String phone, double weight, double height, Date createDate, Date updateDate, String medicalHistory, String doctorNote) {
+        this.imageId = id;
         this.url = url;
         this.mark = mark;
         this.name = name;
@@ -147,5 +149,13 @@ public class ImageDTO {
 
     public void setDoctorNote(String doctorNote) {
         this.doctorNote = doctorNote;
+    }
+
+    public int getImageId() {
+        return imageId;
+    }
+
+    public void setImageId(int imageId) {
+        this.imageId = imageId;
     }
 }

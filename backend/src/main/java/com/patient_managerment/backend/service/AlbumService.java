@@ -30,6 +30,7 @@ public class AlbumService implements AlbumServiceImp {
                 int albumId = album.getId();
 
                 AlbumDTO albumDTO = new AlbumDTO();
+                albumDTO.setAlbumId(albumId);
                 albumDTO.setName(album.getName());
                 albumDTO.setCreateDate(album.getCreateDate());
                 albumDTO.setUpdateDate(album.getUpdateDate());
@@ -44,10 +45,12 @@ public class AlbumService implements AlbumServiceImp {
                 for(Record image : recordList){
                     ImageDTO imageDTO = new ImageDTO();
 
+                    imageDTO.setImageId(image.getId());
                     imageDTO.setUrl(image.getUrl());
                     imageDTO.setMark(image.isMark());
                     imageDTO.setName(image.getName());
                     imageDTO.setAddress(image.getAddress());
+                    imageDTO.setSex(image.getSex());
                     imageDTO.setBirthday(image.getBirthday());
                     imageDTO.setPhone(image.getPhone());
                     imageDTO.setHeight(image.getHeight());
@@ -77,8 +80,10 @@ public class AlbumService implements AlbumServiceImp {
             ImageDTO imageDTO = new ImageDTO();
             if(imageAlbumList != null && imageAlbumList.size() > 0) {
                 Record existedRecord = imageAlbumList.get(0).getRecord();
+                imageDTO.setImageId(existedRecord.getId());
                 imageDTO.setMark(existedRecord.isMark());
                 imageDTO.setName(existedRecord.getName());
+                imageDTO.setSex(existedRecord.getSex());
                 imageDTO.setAddress(existedRecord.getAddress());
                 imageDTO.setBirthday(existedRecord.getBirthday());
                 imageDTO.setPhone(existedRecord.getPhone());

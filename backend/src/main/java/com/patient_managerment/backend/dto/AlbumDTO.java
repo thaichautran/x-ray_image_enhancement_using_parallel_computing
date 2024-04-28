@@ -4,6 +4,7 @@ import java.util.Date;
 import java.util.List;
 
 public class AlbumDTO {
+    private int albumId;
     private String name;
     private Date createDate;
     private Date updateDate;
@@ -39,5 +40,13 @@ public class AlbumDTO {
 
     public void setImageDTOList(List<ImageDTO> imageDTOList) {
         this.imageDTOList = imageDTOList;
+    }
+
+    public int getAlbumId() {
+        return albumId;
+    }
+
+    public void setAlbumId(int albumId) {
+        this.albumId = albumId;
     }
 }
