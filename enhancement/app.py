@@ -1,13 +1,14 @@
+
+import cv2 # type: ignore
+import io
+from tkinter import Image
+from flask import Flask, request, jsonify
 import numpy as np
-<<<<<<< Updated upstream
-=======
 import base64
 from PIL import Image
 import matplotlib.pyplot as plt
 from collections import OrderedDict
-
 from joblib import Parallel, delayed
->>>>>>> Stashed changes
 
 # Chuẩn hóa lại val theo khoảng giá trị mới
 def normalize(min_old, max_old, min_new, max_new, val):
@@ -35,13 +36,9 @@ def to_grayscale(image):
 
 	return image.astype(np.uint8)
 
-<<<<<<< Updated upstream
 #CLAHE FUNCTION
 #ALL UTILITY FUNCTIONS COMBINED INTO ONE FUNCTION
-=======
-
 #CLAHE FUNCTION, ALL UTILITY FUNCTIONS COMBINED INTO ONE FUNCTION
->>>>>>> Stashed changes
 def clahe(img,clipLimit, tile=32):
     '''img - Input image
        clipLimit - Normalized clipLimit. Higher value gives more contrast
@@ -61,16 +58,14 @@ def clahe(img,clipLimit, tile=32):
     ysz = tile
 
     # nX và nY là số ô có kích thước xsz * ysz trong ảnh kết quả.
-<<<<<<< Updated upstream
+
     nX = np.ceil(h/xsz).astype(int)#240
     nY = np.ceil(w/ysz).astype(int)#320
 
     #Excess number of pixels to get an integer value of nX and nY
-=======
     nX = int(np.ceil(h/xsz))#240
     nY = int(np.ceil(w/ysz))#320
 
->>>>>>> Stashed changes
     # Tính phần bị thiếu nếu như chia ảnh thành các ô theo kích thước xsz và ysz
     excX = int(xsz*(nX-h/xsz))
     excY = int(ysz*(nY-w/ysz))
@@ -79,11 +74,9 @@ def clahe(img,clipLimit, tile=32):
     if excX!=0:
         img = np.append(img, np.zeros((excX, img.shape[1]), dtype=int), axis=0)
     if excY!=0:
-<<<<<<< Updated upstream
         img = np.append(img,np.zeros((img.shape[0],excY)).astype(int),axis=1)
-=======
         img = np.append(img, np.zeros((img.shape[0], excY), dtype=int), axis=1)
->>>>>>> Stashed changes
+
 
     # Tính số lượng pixel cần xử lý tính toán
     nPixels = xsz*ysz
@@ -106,10 +99,8 @@ def clahe(img,clipLimit, tile=32):
     bins = LUT[img]
     print(bins.shape)
 
-<<<<<<< Updated upstream
     #makeHistogram
-=======
->>>>>>> Stashed changes
+
     # Tạo mảng hist lưu giá trị histogram cho từng ô
     print("...Making the Histogram...")
     hist = np.zeros((nX,nY,nBins))
@@ -131,11 +122,7 @@ def clahe(img,clipLimit, tile=32):
                 excess = hist[i,j,n] - clipLimit
                 if excess>0:
                     nExcess += excess
-<<<<<<< Updated upstream
 
-=======
-                    
->>>>>>> Stashed changes
             binIncr = nExcess/nBins
             upper = clipLimit - binIncr
             # Giới hạn sao cho hist của 1 giá trị bins bất kỳ không vượt quá clipLimit
@@ -158,12 +145,9 @@ def clahe(img,clipLimit, tile=32):
                     if nExcess < 1:
                         break
 
-<<<<<<< Updated upstream
     #mapHistogram
     # Giống như tạo mảng giá trị cdf
-=======
     #mapHistogram. Giống như tạo mảng giá trị cdf
->>>>>>> Stashed changes
     print("...Mapping the Histogram...")
     map_ = np.zeros((nX,nY,nBins))
     #print(map_.shape)
@@ -235,26 +219,28 @@ def clahe(img,clipLimit, tile=32):
     else:
         return clahe_img
 
-<<<<<<< Updated upstream
+
 def run(image):
     processed_images_list = []
 =======
 # Thử nghiệm song song. Xử lý 1 ảnh và trả về kết quả là list chứa các ảnh với clipLimit khác nhau.
 def run(image):
+
+def run(images, clip_limit = 8):
+
     processed_images = []
->>>>>>> Stashed changes
     if len(image.shape) > 2:
         image = to_grayscale(image)
 
     normalized_image = normalize(np.min(image), np.max(image), 0, 255, image)
 
-<<<<<<< Updated upstream
+
     for i in range(4, 64, 4):
         equalized_image = clahe(img=normalized_image, clipLimit=i)
         processed_images_list.append(equalized_image)
 
     return processed_images_list
-=======
+
     # Sử dụng Parallel và delayed để chạy vòng for song song
     results = Parallel(n_jobs=-1)(delayed(clahe)(img=normalized_image, clipLimit=i) for i in range(4, 64, 4))
     processed_images.extend(results)
@@ -302,4 +288,4 @@ def convert_images():
     
 if __name__ == '__main__':
     app.run(debug=True)
->>>>>>> Stashed changes
+

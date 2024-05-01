@@ -1,0 +1,14 @@
+.circle {
+    display: inline-block;
+    width: 1.375rem;
+    height: 1.375rem;
+    border-radius: 50%;
+    background-color: #12cc30;
+}
+.back {
+    color: $color-gray-bold;
+    &:hover {
+        cursor: pointer;
+        text-decoration: underline;
+    }
+}

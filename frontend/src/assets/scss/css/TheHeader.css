@@ -1,0 +1,8 @@
+@font-face {
+  font-family: fontLogo;
+  src: url("../../../assets/fonts/ArgentumSans-Light.otf");
+}
+.logo-text {
+  font-family: fontLogo;
+  font-size: 20px;
+}/*# sourceMappingURL=TheHeader.css.map */

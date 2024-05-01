@@ -1,24 +1,32 @@
-import logo from './logo.svg';
-import './App.css';
-
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import DefaultLayout from "./layouts/DefaultLayout";
+import NotHeaderLayout from "./layouts/NotHeaderLayout";
+import { routes } from "./router/routes";
+import React, { Fragment, useEffect } from "react";
+import "./App.scss";
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Fragment>
+      <Router>
+        <Routes>
+          {routes.map((route) => {
+            const Page = route.page;
+            const Layout = route.isShowHeader ? DefaultLayout : NotHeaderLayout;
+            return (
+              <Route
+                key={route.path}
+                path={route.path}
+                element={
+                  <Layout>
+                    <Page />
+                  </Layout>
+                }
+              ></Route>
+            );
+          })}
+        </Routes>
+      </Router>
+    </Fragment>
   );
 }
 

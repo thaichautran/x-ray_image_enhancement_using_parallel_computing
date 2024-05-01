@@ -1,0 +1,25 @@
+.home .home-new-documents {
+  margin: 2rem 0;
+}
+.home .home-new-documents h3 {
+  display: flex;
+  margin-bottom: 2rem;
+}
+.home .home-most-view-documents {
+  margin: 2rem 0;
+}
+.home .home-most-view-documents h3 {
+  display: flex;
+  margin-bottom: 2rem;
+}
+.home .home-most-download-documents h3 {
+  display: flex;
+  margin-bottom: 2rem;
+}
+.home .home-most-download-documents {
+  margin: 2rem 0;
+}
+.home .home-most-download-documents h3 {
+  display: flex;
+  margin-bottom: 2rem;
+}/*# sourceMappingURL=Home.css.map */
