@@ -8,7 +8,8 @@ import base64
 from PIL import Image
 import matplotlib.pyplot as plt
 from collections import OrderedDict
-
+import requests
+from flask_cors import CORS
 # window_size = 128
 # clip_limit = 100
 # n_iter = 1
@@ -236,42 +237,50 @@ def run(images, clip_limit = 8):
 
 
 app = Flask(__name__)
-
+CORS(app)
 @app.route('/')
 def home():
     return "Hello, World!"
 
 @app.route('/convert', methods=['POST'])
 def convert_images():
-    if 'images' not in request.files:
-        return jsonify({'error': 'No images provided'}), 400
-    
-    images = request.files.getlist('images')
-    clip_limit = float(request.form.get('clip_limit', 8))
-    
     try:
+        request_data = request.json
+        
+        if not isinstance(request_data, dict):
+            return jsonify({'error': 'Invalid JSON format'}), 400
+
+        urls = request_data.get('image_urls', [])  # Assumed the image URLs are sent in JSON format
+
+        if not urls:
+            return jsonify({'error': 'No image URLs provided'}), 400
+
+        clip_limit = float(request_data.get('clip_limit', 8))
+
         processed_images = []
-        for img_file in images:
-            # Đọc dữ liệu từ file ảnh và chuyển đổi thành mảng numpy
-            img_data = np.frombuffer(img_file.read(), np.uint8)
+        for url in urls:
+            # Lấy dữ liệu hình ảnh từ URL
+            response = requests.get(url)
+            img_data = np.frombuffer(response.content, np.uint8)
             image = cv2.imdecode(img_data, cv2.IMREAD_COLOR)
             processed_images.append(image)
 
         processed_images = run(processed_images, clip_limit)
-        
+
+        base64_images = []
+        for image in processed_images:
+            image = image.astype(np.uint8)
+            image_data = Image.fromarray(image)
+            buffer = io.BytesIO()
+            image_data.save(buffer, format='JPEG')
+            base64_image = base64.b64encode(buffer.getvalue()).decode('utf-8')
+            base64_images.append(f'data:image/jpeg;base64,{base64_image}')
+
+        return jsonify({'data': base64_images}), 200
+    
     except Exception as e:
         return jsonify({'error': str(e)}), 400
-    
-    base64_images = []
-    for image in processed_images:
-        image = image.astype(np.uint8)
-        image_data = Image.fromarray(image)
-        buffer = io.BytesIO()
-        image_data.save(buffer, format='JPEG')
-        base64_image = base64.b64encode(buffer.getvalue()).decode('utf-8')
-        base64_images.append(base64_image)
 
-    return jsonify({'data': base64_images}), 200
     
 if __name__ == '__main__':
     app.run(debug=True)
