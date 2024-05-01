@@ -219,27 +219,13 @@ def clahe(img,clipLimit, tile=32):
     else:
         return clahe_img
 
-
-def run(image):
-    processed_images_list = []
-=======
 # Thử nghiệm song song. Xử lý 1 ảnh và trả về kết quả là list chứa các ảnh với clipLimit khác nhau.
 def run(image):
-
-def run(images, clip_limit = 8):
-
     processed_images = []
     if len(image.shape) > 2:
         image = to_grayscale(image)
 
     normalized_image = normalize(np.min(image), np.max(image), 0, 255, image)
-
-
-    for i in range(4, 64, 4):
-        equalized_image = clahe(img=normalized_image, clipLimit=i)
-        processed_images_list.append(equalized_image)
-
-    return processed_images_list
 
     # Sử dụng Parallel và delayed để chạy vòng for song song
     results = Parallel(n_jobs=-1)(delayed(clahe)(img=normalized_image, clipLimit=i) for i in range(4, 64, 4))
@@ -288,4 +274,3 @@ def convert_images():
     
 if __name__ == '__main__':
     app.run(debug=True)
-
