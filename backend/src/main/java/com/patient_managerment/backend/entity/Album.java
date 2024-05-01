@@ -19,11 +19,11 @@ public class Album {
 
 
     @CreationTimestamp
-    @Column(name = "create_date", nullable = false, updatable = false)
+    @Column(name = "create_date")
     private Date createDate;
 
     @CreationTimestamp
-    @Column(name = "update_date", nullable = false, updatable = false)
+    @Column(name = "update_date")
     private Date updateDate;
 
     @Column(name = "cover_photo")
