@@ -4,7 +4,7 @@ import { Button, Col, Modal } from "antd";
 import { useNavigate } from "react-router-dom";
 import "../../assets/scss/components/ImageItem.scss";
 
-export default function AlbumItem({ album }) {
+export default function AlbumItem({ album, getNewList }) {
   const navigate = useNavigate();
 
   return (

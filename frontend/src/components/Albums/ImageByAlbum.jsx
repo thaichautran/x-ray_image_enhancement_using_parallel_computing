@@ -5,9 +5,11 @@ import ImageView from "../Images/ImageView";
 export default function ImageByAlbum() {
   const location = useLocation();
   const imageList = location.state.imageList;
+  const getNewList = () => {};
+
   return (
     <section id="album-view">
-      {<ImageView imageList={imageList}></ImageView>}
+      {<ImageView imageList={imageList} getNewList={getNewList}></ImageView>}
     </section>
   );
 }

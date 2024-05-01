@@ -1,13 +1,17 @@
 import React, { useEffect } from "react";
 import { Row, Col } from "antd";
 import AlbumItem from "./AlbumItem";
-export default function AlbumList({ albumList }) {
+export default function AlbumList({ albumList, getNewList }) {
   useEffect(() => {}, [albumList]);
   const renderAlbumList = () => {
     return albumList.map((album) => {
       return (
         <Col span={4}>
-          <AlbumItem key={album.albumId} album={album}></AlbumItem>
+          <AlbumItem
+            getNewList={getNewList}
+            key={album.albumId}
+            album={album}
+          ></AlbumItem>
         </Col>
       );
     });

@@ -4,7 +4,7 @@ import dayjs from "dayjs";
 import "dayjs/locale/vi";
 import { LeftOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router";
-export default function ImageView({ imageList }) {
+export default function ImageView({ imageList, getNewList }) {
   const [createdDateList, setCreatedDateList] = useState([]);
   const [today, setToday] = useState(new Date());
   const [yesterday, setYesterday] = useState();
@@ -13,7 +13,7 @@ export default function ImageView({ imageList }) {
     getCreatedDateList();
     getToday();
     getYesterday();
-  }, []);
+  }, [imageList]);
 
   const getToday = () => {
     setToday(dayjs(today).format("DD-MM-YYYY"));
@@ -30,7 +30,7 @@ export default function ImageView({ imageList }) {
 
   const getCreatedDateList = async () => {
     let dates = [];
-    imageList.forEach((image) => {
+    imageList?.forEach((image) => {
       dates.push(image.createDate);
     });
     dates.sort();
@@ -59,13 +59,9 @@ export default function ImageView({ imageList }) {
   };
 
   const getImageListByDate = (date) => {
-    return imageList.filter((image) => {
+    return imageList?.filter((image) => {
       return formatDate(image.createDate) === date;
     });
-  };
-
-  const getImageList = () => {
-    // Do something
   };
 
   return (
@@ -79,7 +75,7 @@ export default function ImageView({ imageList }) {
         Quay lại
       </span>
 
-      {imageList.length > 0 ? (
+      {imageList?.length > 0 ? (
         <div className="image-view-gallery">
           {getYear(createdDateList).map((year) => (
             <div key={year}>
@@ -135,7 +131,7 @@ export default function ImageView({ imageList }) {
                                 <div style={{ marginTop: "1rem" }}>
                                   <ImageList
                                     imageList={getImageListByDate(date)}
-                                    getNewList={getImageList}
+                                    getNewList={getNewList}
                                   />
                                 </div>
                               </p>
@@ -157,7 +153,7 @@ export default function ImageView({ imageList }) {
                                 <div style={{ marginTop: "1rem" }}>
                                   <ImageList
                                     imageList={getImageListByDate(date)}
-                                    getNewList={getImageList}
+                                    getNewList={getNewList}
                                   />
                                 </div>
                               </p>
@@ -185,7 +181,7 @@ export default function ImageView({ imageList }) {
                                 <div style={{ marginTop: "1rem" }}>
                                   <ImageList
                                     imageList={getImageListByDate(date)}
-                                    getNewList={getImageList}
+                                    getNewList={getNewList}
                                   />
                                 </div>
                               </p>

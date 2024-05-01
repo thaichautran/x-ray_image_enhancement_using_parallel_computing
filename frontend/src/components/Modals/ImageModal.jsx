@@ -25,6 +25,7 @@ import {
   DownloadOutlined,
   UserSwitchOutlined,
   FolderAddOutlined,
+  DeleteOutlined,
   ClockCircleOutlined,
   EnvironmentOutlined,
   UserOutlined,
@@ -38,8 +39,14 @@ export default function ImageModal({
   image,
   imageList,
   onCancel,
-  enhancedImage,
+  enhancedImageList,
 }) {
+  const handleDownload = (base64string) => {
+    const link = document.createElement("a");
+    link.href = base64string;
+    link.download = "image.jpg";
+    link.click();
+  };
   const calculateAge = (birthday) => {
     const birthDate = new Date(birthday);
     console.log(birthDate);
@@ -71,7 +78,9 @@ export default function ImageModal({
   const [doctorNote, setDoctorNote] = useState(image.doctorNote);
   const [mark, setMark] = useState(image.mark);
   const [imageUrl, setImageUrl] = useState(image.url);
-  const [stepLimit, setStepLimit] = useState(4);
+  const [enhancedImage, setEnhancedImage] = useState(
+    enhancedImageList ? enhancedImageList[0] : ""
+  );
   const loadMoreData = () => {
     if (loading) {
       return;
@@ -91,14 +100,16 @@ export default function ImageModal({
     setMedicaHistory(image.medicalHistory);
     setDoctorNote(image.doctorNote);
     setMark(image.mark);
+    setEnhancedImage(null);
   };
 
   useEffect(() => {
+    setEnhancedImage(enhancedImageList ? enhancedImageList[0] : "");
     setPatientAge(calculateAge(image.birthday));
     setDefaultDate(dayjs(image.createDate).format("DD/MM/YYYY"));
     loadMoreData();
     setImages(imageList.map((img) => img.url));
-  }, []);
+  }, [enhancedImageList]);
   //dropdown
   const items = [
     {
@@ -142,37 +153,73 @@ export default function ImageModal({
   return (
     <div className="image-model">
       <Row style={{ justifyContent: "space-between" }} gutter={16}>
-        {enhancedImage ? (
+        {enhancedImageList?.length > 0 && enhancedImage ? (
           <Col span={12}>
             <Image className="image" src={enhancedImage} alt={image.name} />
             <Slider
-              style={{ width: "60%" }}
-              max={32}
-              min={4}
-              marks={{
-                4: "4",
-                8: "8",
-                16: "16",
-                32: "32",
+              style={{ width: "90%", marginTop: "4rem" }}
+              onChange={(value) => {
+                setEnhancedImage(enhancedImageList[value]);
               }}
-              step={stepLimit * 2}
-              defaultValue={37}
+              max={14}
+              min={0}
+              marks={{
+                0: "4",
+                1: "8",
+                2: "12",
+                3: "16",
+                4: "20",
+                5: "24",
+                6: "28",
+                7: "32",
+                8: "36",
+                9: "40",
+                10: "44",
+                11: "48",
+                12: "52",
+                13: "56",
+                14: "60",
+              }}
+              step={1}
+              defaultValue={0}
             />
           </Col>
         ) : null}
 
         <Col span={12}>
-          <Image.PreviewGroup items={images}>
-            <Image width={"100%"} src={imageUrl} />
-          </Image.PreviewGroup>
+          <Image width={"100%"} src={imageUrl} />
+
           <h2>Ghi chú</h2>
           {isEdit ? (
-            <TextArea
-              style={{ width: "100%" }}
-              defaultValue={doctorNote}
-            ></TextArea>
+            <div style={{ textAlign: "right" }}>
+              <TextArea
+                style={{ width: "100%" }}
+                defaultValue={doctorNote}
+              ></TextArea>
+              <div style={{ marginTop: "1rem", marginBottom: "3rem" }}>
+                <Button
+                  style={{ marginRight: "1rem" }}
+                  onClick={() => {
+                    setIsEdit(false);
+                  }}
+                >
+                  Hủy bỏ
+                </Button>
+                <Button style={{ backgroundColor: "black", color: "white" }}>
+                  Hoàn tất
+                </Button>
+              </div>
+            </div>
           ) : (
-            <p>{doctorNote}</p>
+            <div style={{ textAlign: "right" }}>
+              <TextArea
+                value={doctorNote}
+                readOnly={true}
+                onDoubleClick={() => setIsEdit(true)}
+                style={{ width: "100%", marginBottom: "3rem" }}
+                defaultValue={doctorNote}
+              ></TextArea>
+            </div>
           )}
         </Col>
         <Col span={12}>
@@ -188,7 +235,7 @@ export default function ImageModal({
               </Button>
             </Col>
             <Col span={12} style={{ textAlign: "right", cursor: "pointer" }}>
-              <Dropdown
+              {/* <Dropdown
                 menu={{
                   items,
                 }}
@@ -197,7 +244,23 @@ export default function ImageModal({
                 <a onClick={(e) => e.preventDefault()}>
                   <EllipsisOutlined />
                 </a>
-              </Dropdown>
+              </Dropdown> */}
+
+              {enhancedImage ? (
+                <Button
+                  style={{ marginRight: "1rem" }}
+                  onClick={() => {
+                    handleDownload(enhancedImage);
+                  }}
+                >
+                  <DownloadOutlined />
+                  &nbsp; Tải xuống
+                </Button>
+              ) : null}
+              <Button danger type="primary" onClick={() => {}}>
+                <DeleteOutlined></DeleteOutlined>
+                &nbsp; Xóa
+              </Button>
             </Col>
           </Row>
           <div
@@ -207,7 +270,7 @@ export default function ImageModal({
               marginTop: "1rem",
             }}
           >
-            <div
+            {/* <div
               onClick={() => {
                 setIsEdit(true);
               }}
@@ -215,16 +278,16 @@ export default function ImageModal({
               <Button>
                 <UserSwitchOutlined /> Chỉnh sửa
               </Button>
-            </div>
+            </div> */}
 
-            <div>
+            {/* <div>
               <Button>
                 <FolderAddOutlined />
                 Thêm vào hồ sơ
               </Button>
-            </div>
+            </div> */}
           </div>
-          {isEdit ? (
+          {/* {isEdit ? (
             <Form layout="vertical" variant="borderless">
               <Form.Item
                 style={{
@@ -363,7 +426,7 @@ export default function ImageModal({
               <div
                 className="relevant-image"
                 style={
-                  enhancedImage
+                  enhancedImageList && enhancedImage
                     ? {
                         width: "80%",
                         position: "absolute",
@@ -385,9 +448,7 @@ export default function ImageModal({
                 >
                   <InfiniteScroll
                     dataLength={data.length}
-                    endMessage={
-                      <Divider plain>It is all, nothing more 🤐</Divider>
-                    }
+                    endMessage={<Divider plain>Không còn ảnh nào 🤐</Divider>}
                     scrollableTarget="scrollableDiv"
                   >
                     <List
@@ -458,7 +519,124 @@ export default function ImageModal({
                 </div>
               </div>
             </div>
-          )}
+          )} */}
+          <div style={{ position: "relative" }}>
+            <h1>{patientName}</h1>
+            <Row>
+              <Col flex={1}>
+                <ClockCircleOutlined />
+                &nbsp;
+                {dayjs(createDate).format("DD/MM/YYYY, HH[h]mm[']")}
+              </Col>
+              <Col flex={1}>
+                <EnvironmentOutlined />
+                &nbsp;
+                {patientAddress}
+              </Col>
+              <Col flex={1}>
+                <UserOutlined />
+                &nbsp;
+                {patientSex} - {patientAge} tuổi
+              </Col>
+            </Row>
+            <h2 style={{ marginBottom: 0 }}>Tiền sử bệnh nhân</h2>
+            <p style={{ margin: 0 }}>{medicaHistory}</p>
+            <div
+              className="relevant-image"
+              style={
+                enhancedImageList && enhancedImage
+                  ? {
+                      width: "95%",
+                      position: "absolute",
+                      right: "-100%",
+                      bottom: "0",
+                    }
+                  : {}
+              }
+            >
+              <h2 style={{ marginBottom: 0 }}>Ảnh X-quang của bệnh nhân</h2>
+              <div
+                id="scrollableDiv"
+                style={{
+                  height: 200,
+                  overflow: "auto",
+                  padding: "0 16px",
+                  border: "1px solid rgba(140, 140, 140, 0.35)",
+                }}
+              >
+                <InfiniteScroll
+                  dataLength={data.length}
+                  endMessage={<Divider plain>Không còn ảnh nào 🤐</Divider>}
+                  scrollableTarget="scrollableDiv"
+                >
+                  <List
+                    header={
+                      <div
+                        style={{
+                          display: "flex",
+                          justifyContent: "space-between",
+                          fontWeight: "bold",
+                        }}
+                      >
+                        <span></span>
+                        <span>Ngày giờ</span>
+                        <span>Ghi chú</span>
+                        <span>Lưu ý</span>
+                      </div>
+                    }
+                    dataSource={data}
+                    renderItem={(item) => (
+                      <div>
+                        <List.Item
+                          className="list-item-hover"
+                          key={item.id}
+                          style={{
+                            cursor: "pointer",
+                          }}
+                          onClick={() => {
+                            setNewImage(item);
+                          }}
+                        >
+                          <List.Item.Meta
+                            avatar={<Avatar shape="square" src={item.url} />}
+                            description={
+                              <div
+                                className="list-item-des-hover"
+                                style={{
+                                  display: "flex",
+                                  justifyContent: "space-around",
+                                }}
+                              >
+                                <p style={{ width: "30%" }}>
+                                  {dayjs(item.createDate).format(
+                                    "HH[h]mm, DD/MM/YYYY"
+                                  )}
+                                </p>
+                                <p
+                                  style={{
+                                    width: "55%",
+                                  }}
+                                >
+                                  {item.doctorNote}
+                                </p>
+                              </div>
+                            }
+                          />
+                          <div>
+                            {item.mark ? (
+                              <StarFilled style={{ color: "yellow" }} />
+                            ) : (
+                              <StarOutlined />
+                            )}
+                          </div>
+                        </List.Item>
+                      </div>
+                    )}
+                  />
+                </InfiniteScroll>
+              </div>
+            </div>
+          </div>
         </Col>
       </Row>
     </div>
