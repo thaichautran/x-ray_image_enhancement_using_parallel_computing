@@ -4,6 +4,9 @@ import {
   UPLOAD_IMAGE,
   AUTO_FILL,
   ENHANCE_IMAGE,
+  MARK_IMAGE,
+  GET_MARKS,
+  DOWNLOAD,
 } from "./constants";
 
 const getAlbums = () => {
@@ -18,4 +21,21 @@ const autoFill = (phoneNumber) => {
 const enhanceImage = (data) => {
   return axios.post(`${ENHANCE_IMAGE}`, data);
 };
-export { getAlbums, uploadImage, autoFill, enhanceImage };
+const markImage = (id, status) => {
+  return axios.put(`${MARK_IMAGE}?id=${id}&status=${status}`);
+};
+const getMarkImages = () => {
+  return axios.get(`${GET_MARKS}?status=true`);
+};
+const downloadImage = (base64String) => {
+  return axios.post(`${DOWNLOAD}`, base64String);
+};
+export {
+  getAlbums,
+  uploadImage,
+  autoFill,
+  enhanceImage,
+  markImage,
+  getMarkImages,
+  downloadImage,
+};

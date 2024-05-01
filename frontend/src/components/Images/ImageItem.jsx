@@ -2,13 +2,19 @@ import React from "react";
 import { useState } from "react";
 import { Button, Col, Modal } from "antd";
 import ImageModal from "../Modals/ImageModal";
-import { ThunderboltOutlined, StarOutlined } from "@ant-design/icons";
+import {
+  ThunderboltOutlined,
+  StarOutlined,
+  StarFilled,
+} from "@ant-design/icons";
 import "../../assets/scss/components/ImageItem.scss";
-import { enhanceImage } from "../../apis/image";
-export default function ImageItem({ image, imageList }) {
+import { enhanceImage, markImage } from "../../apis/image";
+
+export default function ImageItem({ image, imageList, getNewList }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [enhancedImage, setEnhancedImage] = useState();
+  const [enhancedImageList, setEnhancedImage] = useState();
+  const [isMark, setIsMark] = useState(image.mark);
   const showModal = () => {
     setIsModalOpen(true);
   };
@@ -22,8 +28,7 @@ export default function ImageItem({ image, imageList }) {
     setLoading(true);
 
     let rqbody = {
-      image_urls: [image.url],
-      clip_lịmit: 8,
+      image_url: image.url,
     };
     await enhanceImage(rqbody)
       .then((res) => {
@@ -34,6 +39,11 @@ export default function ImageItem({ image, imageList }) {
         console.log(err);
         setLoading(false);
       });
+  };
+  const handleMarkImage = async () => {
+    setIsMark(!isMark);
+
+    await markImage(image.imageId, !isMark);
   };
   return (
     <div id="image-item">
@@ -63,10 +73,21 @@ export default function ImageItem({ image, imageList }) {
                 width: "50%",
               }}
             >
-              <Button>
-                <StarOutlined /> Chú ý
+              <Button
+                onClick={() => {
+                  getNewList();
+                  handleMarkImage();
+                }}
+              >
+                {isMark ? (
+                  <StarFilled style={{ color: "yellow" }} />
+                ) : (
+                  <StarOutlined />
+                )}{" "}
+                Chú ý
               </Button>
               <Button
+                type="primary"
                 loading={loading}
                 onClick={() => {
                   enhance();
@@ -79,7 +100,7 @@ export default function ImageItem({ image, imageList }) {
         }
       >
         <ImageModal
-          enhancedImage={enhancedImage}
+          enhancedImageList={enhancedImageList}
           image={image}
           imageList={imageList}
           onCancel={handleCancel}

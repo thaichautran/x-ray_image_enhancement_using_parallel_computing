@@ -9,7 +9,8 @@ from PIL import Image
 import matplotlib.pyplot as plt
 from collections import OrderedDict
 import requests
-from flask_cors import CORSfrom joblib import Parallel, delayed
+from flask_cors import CORS
+from joblib import Parallel, delayed
 
 # Chuẩn hóa lại val theo khoảng giá trị mới
 def normalize(min_old, max_old, min_new, max_new, val):
@@ -249,22 +250,18 @@ def convert_images():
         if not isinstance(request_data, dict):
             return jsonify({'error': 'Invalid JSON format'}), 400
 
-        urls = request_data.get('image_urls', [])  # Assumed the image URLs are sent in JSON format
+        url = request_data.get('image_url', "")  # Assumed the image URLs are sent in JSON format
 
-        if not urls:
+        if not url:
             return jsonify({'error': 'No image URLs provided'}), 400
-
-        clip_limit = float(request_data.get('clip_limit', 8))
-
-        processed_images = []
-        for url in urls:
-            # Lấy dữ liệu hình ảnh từ URL
-            response = requests.get(url)
-            img_data = np.frombuffer(response.content, np.uint8)
-            image = cv2.imdecode(img_data, cv2.IMREAD_COLOR)
-            processed_images.append(image)
-
-        processed_images = run(processed_images, clip_limit)
+        
+    
+        # Lấy dữ liệu hình ảnh từ URL
+        response = requests.get(url)
+        img_data = np.frombuffer(response.content, np.uint8)
+        image = cv2.imdecode(img_data, cv2.IMREAD_COLOR)
+        
+        processed_images = run(image)
 
         base64_images = []
         for image in processed_images:
