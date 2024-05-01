@@ -2,6 +2,7 @@ package com.patient_managerment.backend.service;
 
 import com.patient_managerment.backend.dto.AlbumDTO;
 import com.patient_managerment.backend.dto.ImageDTO;
+import com.patient_managerment.backend.dto.ImagesDTO;
 import com.patient_managerment.backend.entity.Album;
 import com.patient_managerment.backend.entity.ImageAlbum;
 import com.patient_managerment.backend.entity.Record;
@@ -97,5 +98,57 @@ public class AlbumService implements AlbumServiceImp {
             return imageDTO;
         }
         return null;
+    }
+
+    @Override
+    public  List<AlbumDTO> getMarkRecord(boolean status) {
+        List<AlbumDTO> albumDTOList = new ArrayList<>();
+        List<Album> albumList = albumRepository.findAll();
+        if(albumList.size() > 0){
+            for(Album album : albumList){
+                int albumId = album.getId();
+
+                AlbumDTO albumDTO = new AlbumDTO();
+                albumDTO.setAlbumId(albumId);
+                albumDTO.setName(album.getName());
+                albumDTO.setCreateDate(album.getCreateDate());
+                albumDTO.setUpdateDate(album.getUpdateDate());
+
+                List<Record> recordList = new ArrayList<>();
+                List<ImageAlbum> imageAlbumList = imageAlbumRepository.findByAlbumId(albumId);
+                for(ImageAlbum imageAlbum : imageAlbumList){
+                    recordList.add(imageAlbum.getRecord());
+                }
+
+                List<ImageDTO> imageDTOList = new ArrayList<>();
+                for(Record image : recordList){
+                    if(image.isMark() == status){
+                        ImageDTO imageDTO = new ImageDTO();
+
+                        imageDTO.setImageId(image.getId());
+                        imageDTO.setUrl(image.getUrl());
+                        imageDTO.setMark(image.isMark());
+                        imageDTO.setName(image.getName());
+                        imageDTO.setAddress(image.getAddress());
+                        imageDTO.setSex(image.getSex());
+                        imageDTO.setBirthday(image.getBirthday());
+                        imageDTO.setPhone(image.getPhone());
+                        imageDTO.setHeight(image.getHeight());
+                        imageDTO.setWeight(image.getWeight());
+                        imageDTO.setCreateDate(image.getCreateDate());
+                        imageDTO.setUpdateDate(image.getUpdateDate());
+                        imageDTO.setMedicalHistory(image.getMedicalHistory());
+                        imageDTO.setDoctorNote(image.getDoctorNote());
+
+                        imageDTOList.add(imageDTO);
+                    }
+                }
+
+                albumDTO.setImageDTOList(imageDTOList);
+                albumDTOList.add((albumDTO));
+
+            }
+        }
+        return albumDTOList;
     }
 }

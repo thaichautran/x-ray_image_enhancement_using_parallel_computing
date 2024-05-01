@@ -9,4 +9,5 @@ import java.util.List;
 public interface ImageAlbumRepository extends JpaRepository<ImageAlbum, KeyImageAlbum> {
     List<ImageAlbum> findImageAlbumsByRecordId(int recordId);
     List<ImageAlbum> findByAlbumId(int albumId);
+    ImageAlbum findByAlbumIdAndRecordId(int albumId, int imageId);
 }
