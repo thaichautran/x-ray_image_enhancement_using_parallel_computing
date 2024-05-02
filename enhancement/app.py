@@ -246,21 +246,16 @@ def home():
 def convert_images():
     try:
         request_data = request.json
-        
         if not isinstance(request_data, dict):
             return jsonify({'error': 'Invalid JSON format'}), 400
-
         url = request_data.get('image_url', "")  # Assumed the image URLs are sent in JSON format
-
         if not url:
             return jsonify({'error': 'No image URLs provided'}), 400
-        
-    
         # Lấy dữ liệu hình ảnh từ URL
         response = requests.get(url)
         img_data = np.frombuffer(response.content, np.uint8)
         image = cv2.imdecode(img_data, cv2.IMREAD_COLOR)
-        
+    
         processed_images = run(image)
 
         base64_images = []

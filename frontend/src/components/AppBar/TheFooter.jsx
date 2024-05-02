@@ -8,7 +8,7 @@ export default function TheFooter() {
           textAlign: "center",
         }}
       >
-        Created by CF3Team
+        Created by Group 4
       </Footer>
     </div>
   );

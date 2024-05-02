@@ -3,12 +3,14 @@ import ImageList from "./ImageList";
 import dayjs from "dayjs";
 import "dayjs/locale/vi";
 import { LeftOutlined } from "@ant-design/icons";
-import { useNavigate } from "react-router";
+import { useNavigate, useLocation } from "react-router";
+
 export default function ImageView({ imageList, getNewList }) {
   const [createdDateList, setCreatedDateList] = useState([]);
   const [today, setToday] = useState(new Date());
   const [yesterday, setYesterday] = useState();
   const navigate = useNavigate();
+  const location = useLocation();
   useEffect(() => {
     getCreatedDateList();
     getToday();
@@ -66,14 +68,16 @@ export default function ImageView({ imageList, getNewList }) {
 
   return (
     <section id="image-view">
-      <span
-        className="back"
-        onClick={() => navigate(-1)}
-        style={{ fontSize: "1.25rem" }}
-      >
-        <LeftOutlined />
-        Quay lại
-      </span>
+      {location.pathname != `/album/${imageList[0]?.phone}` ? (
+        <span
+          className="back"
+          onClick={() => navigate(-1)}
+          style={{ fontSize: "1.25rem" }}
+        >
+          <LeftOutlined />
+          Quay lại
+        </span>
+      ) : null}
 
       {imageList?.length > 0 ? (
         <div className="image-view-gallery">

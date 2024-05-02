@@ -3,6 +3,7 @@ import { Row, Col } from "antd";
 import AlbumItem from "./AlbumItem";
 export default function AlbumList({ albumList, getNewList }) {
   useEffect(() => {}, [albumList]);
+
   const renderAlbumList = () => {
     return albumList.map((album) => {
       return (

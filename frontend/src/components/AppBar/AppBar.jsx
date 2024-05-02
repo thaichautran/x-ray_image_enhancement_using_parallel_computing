@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import Footer from "./TheFooter";
 import Header from "./TheHeader";
-import { UserOutlined, StarOutlined } from "@ant-design/icons";
+import { UserOutlined, StarOutlined, DeleteOutlined } from "@ant-design/icons";
 import { Breadcrumb, Layout, Menu, Button, theme, Spin } from "antd";
 import { useNavigate, Link } from "react-router-dom";
 import LogoIcon from "../../assets/images/logo.svg";
@@ -126,6 +126,16 @@ export default function AppBar({ children }) {
               }}
             >
               Chú ý
+            </Menu.Item>
+            <Menu.Item
+              style={{ marginTop: "25rem" }}
+              key="3"
+              icon={<DeleteOutlined />}
+              onClick={() => {
+                navigate("/trash");
+              }}
+            >
+              Thùng rác
             </Menu.Item>
           </Menu>
         </Sider>

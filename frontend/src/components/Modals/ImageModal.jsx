@@ -15,12 +15,15 @@ import {
   Skeleton,
   Divider,
   Slider,
+  message,
+  Popconfirm,
 } from "antd";
 import {
   EllipsisOutlined,
   LeftOutlined,
   FileImageOutlined,
   EditOutlined,
+  QuestionCircleOutlined,
   FolderOpenOutlined,
   DownloadOutlined,
   UserSwitchOutlined,
@@ -31,16 +34,20 @@ import {
   UserOutlined,
   StarOutlined,
   StarFilled,
+  RedoOutlined,
 } from "@ant-design/icons";
 import InfiniteScroll from "react-infinite-scroll-component";
-
+import { useLocation } from "react-router-dom";
 import dayjs from "dayjs";
+import { remove, deleteImage, restore } from "../../apis/image";
 export default function ImageModal({
   image,
   imageList,
   onCancel,
   enhancedImageList,
+  getNewList,
 }) {
+  const location = useLocation();
   const handleDownload = (base64string) => {
     const link = document.createElement("a");
     link.href = base64string;
@@ -149,7 +156,47 @@ export default function ImageModal({
       key: "3",
     },
   ];
-
+  const handleRemove = async (imageId) => {
+    setLoading(true);
+    await remove(imageId)
+      .then((res) => {
+        onCancel();
+        getNewList();
+        message.success("Chuyển ảnh vào thùng rác thành công");
+        setLoading(false);
+      })
+      .catch((err) => {
+        message.error("Chuyển ảnh vào thùng rác không thành công");
+        setLoading(false);
+      });
+  };
+  const handleDeleteImage = async (imageId) => {
+    await deleteImage(imageId)
+      .then((res) => {
+        message.success("Xóa ảnh thành công");
+        onCancel();
+        getNewList();
+        setLoading(false);
+      })
+      .catch((err) => {
+        message.error("Xóa ảnh không thành công");
+        setLoading(false);
+      });
+  };
+  const handleRestore = async (imageId) => {
+    setLoading(true);
+    await restore(imageId)
+      .then((res) => {
+        message.success("Khôi phục ảnh thành công");
+        onCancel();
+        getNewList();
+        setLoading(false);
+      })
+      .catch((err) => {
+        message.error("Khôi phục ảnh không thành công");
+        setLoading(false);
+      });
+  };
   return (
     <div className="image-model">
       <Row style={{ justifyContent: "space-between" }} gutter={16}>
@@ -248,7 +295,7 @@ export default function ImageModal({
 
               {enhancedImage ? (
                 <Button
-                  style={{ marginRight: "1rem" }}
+                  style={{ marginRight: "1rem", marginBottom: "1rem" }}
                   onClick={() => {
                     handleDownload(enhancedImage);
                   }}
@@ -257,10 +304,60 @@ export default function ImageModal({
                   &nbsp; Tải xuống
                 </Button>
               ) : null}
-              <Button danger type="primary" onClick={() => {}}>
-                <DeleteOutlined></DeleteOutlined>
-                &nbsp; Xóa
-              </Button>
+
+              {location.pathname == "/trash" ? (
+                <div>
+                  <Popconfirm
+                    title="Bạn có muốn xóa ảnh khỏi thùng rác không?"
+                    description="Xóa ảnh khỏi thùng rác sẽ không thể khôi phục!"
+                    okText="Xóa"
+                    cancelText="Hủy"
+                    okButtonProps={{ type: "primary", danger: true }}
+                    onConfirm={() => {
+                      handleDeleteImage(image.imageId);
+                    }}
+                    icon={<QuestionCircleOutlined style={{ color: "red" }} />}
+                  >
+                    <Button danger type="primary">
+                      <DeleteOutlined></DeleteOutlined>
+                      &nbsp; Xóa
+                    </Button>
+                  </Popconfirm>
+                  <Popconfirm
+                    title="Bạn muốn khôi phục ảnh này"
+                    description="Khôi phục ảnh này sẽ đưa ảnh vào hồ sơ của bạn!"
+                    okText="Khôi phục"
+                    cancelText="Hủy"
+                    okButtonProps={{ type: "primary" }}
+                    onConfirm={() => {
+                      handleRestore(image.imageId);
+                    }}
+                    icon={<QuestionCircleOutlined style={{ color: "green" }} />}
+                  >
+                    <Button type="primary" style={{ marginLeft: "1rem" }}>
+                      <RedoOutlined />
+                      &nbsp; Khôi phục
+                    </Button>
+                  </Popconfirm>
+                </div>
+              ) : (
+                <Popconfirm
+                  title="Bạn có muốn chuyển ảnh vào thùng rác không?"
+                  description="Ảnh của bạn có thể khôi phục được!"
+                  okText="Đồng ý"
+                  cancelText="Hủy"
+                  okButtonProps={{ type: "primary", danger: true }}
+                  onConfirm={() => {
+                    handleRemove(image.imageId);
+                  }}
+                  icon={<QuestionCircleOutlined style={{ color: "red" }} />}
+                >
+                  <Button danger type="primary">
+                    <DeleteOutlined></DeleteOutlined>
+                    &nbsp; Chuyển vào thùng rác
+                  </Button>
+                </Popconfirm>
+              )}
             </Col>
           </Row>
           <div
