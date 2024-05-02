@@ -10,6 +10,16 @@ import java.awt.*;
 public interface RecordServiceImp {
     ImageDTO markRecord(int recordId, boolean mark);
     ImageDTO deleteRecord(int id);
+    ImageDTO noteRecord(int id, String note);
+    ImageDTO removeRecord(int id);
+    ImageDTO restoreRecord(int id);
+
+
+
+
+
+
+
 
 
 }

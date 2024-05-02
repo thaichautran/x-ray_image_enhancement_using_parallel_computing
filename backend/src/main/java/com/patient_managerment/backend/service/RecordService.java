@@ -79,6 +79,108 @@ public class RecordService implements RecordServiceImp {
         return null;
     }
 
+    @Override
+    public ImageDTO noteRecord(int id, String note) {
+        Optional<Record> record = recordRepository.findById(id);
+        if (record != null) {
+            Record image = record.get();
+            image.setDoctorNote(note);
+
+            image.setUpdateDate(new Date());
+
+            recordRepository.save(image);
+
+            ImageDTO imageDTO = new ImageDTO();
+
+            imageDTO.setImageId(image.getId());
+            imageDTO.setUrl(image.getUrl());
+            imageDTO.setMark(image.isMark());
+            imageDTO.setName(image.getName());
+            imageDTO.setAddress(image.getAddress());
+            imageDTO.setSex(image.getSex());
+            imageDTO.setBirthday(image.getBirthday());
+            imageDTO.setPhone(image.getPhone());
+            imageDTO.setHeight(image.getHeight());
+            imageDTO.setWeight(image.getWeight());
+            imageDTO.setCreateDate(image.getCreateDate());
+            imageDTO.setUpdateDate(image.getUpdateDate());
+            imageDTO.setMedicalHistory(image.getMedicalHistory());
+            imageDTO.setDoctorNote(image.getDoctorNote());
+
+            return imageDTO;
+        }
+        return null;
+    }
+
+    @Override
+    public ImageDTO removeRecord(int id) {
+        Optional<Record> record = recordRepository.findById(id);
+        if (record != null) {
+            Record image = record.get();
+            image.setRemove(true);
+
+            image.setUpdateDate(new Date());
+
+            recordRepository.save(image);
+
+            ImageDTO imageDTO = new ImageDTO();
+
+            imageDTO.setImageId(image.getId());
+            imageDTO.setUrl(image.getUrl());
+            imageDTO.setMark(image.isMark());
+            imageDTO.setName(image.getName());
+            imageDTO.setAddress(image.getAddress());
+            imageDTO.setSex(image.getSex());
+            imageDTO.setBirthday(image.getBirthday());
+            imageDTO.setPhone(image.getPhone());
+            imageDTO.setHeight(image.getHeight());
+            imageDTO.setWeight(image.getWeight());
+            imageDTO.setCreateDate(image.getCreateDate());
+            imageDTO.setUpdateDate(image.getUpdateDate());
+            imageDTO.setMedicalHistory(image.getMedicalHistory());
+            imageDTO.setDoctorNote(image.getDoctorNote());
+            imageDTO.setRemove(image.isRemove());
+
+            return imageDTO;
+        }
+        return null;
+    }
+
+    @Override
+    public ImageDTO restoreRecord(int id) {
+        Optional<Record> record = recordRepository.findById(id);
+        if (record != null) {
+            Record image = record.get();
+            image.setRemove(false);
+
+            image.setUpdateDate(new Date());
+
+            recordRepository.save(image);
+
+            ImageDTO imageDTO = new ImageDTO();
+
+            imageDTO.setImageId(image.getId());
+            imageDTO.setUrl(image.getUrl());
+            imageDTO.setMark(image.isMark());
+            imageDTO.setName(image.getName());
+            imageDTO.setAddress(image.getAddress());
+            imageDTO.setSex(image.getSex());
+            imageDTO.setBirthday(image.getBirthday());
+            imageDTO.setPhone(image.getPhone());
+            imageDTO.setHeight(image.getHeight());
+            imageDTO.setWeight(image.getWeight());
+            imageDTO.setCreateDate(image.getCreateDate());
+            imageDTO.setUpdateDate(image.getUpdateDate());
+            imageDTO.setMedicalHistory(image.getMedicalHistory());
+            imageDTO.setDoctorNote(image.getDoctorNote());
+            imageDTO.setRemove(image.isRemove());
+
+            return imageDTO;
+        }
+        return null;
+    }
+
+
 
 
 }

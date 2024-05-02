@@ -55,7 +55,37 @@ public class RecordController {
 
         ImageDTO imageDTO = recordServiceImp.markRecord(id, status);
         respondData.setData(imageDTO);
-        respondData.setDesc("Update image favourite status successfully!");
+        respondData.setDesc("Update image mark successfully!");
+        return new ResponseEntity<>(respondData, HttpStatus.OK);
+    }
+
+    @PutMapping("/note")
+    public ResponseEntity<?> noteTheRecord(@RequestParam int id, @RequestParam String note){
+        RespondData respondData = new RespondData();
+
+        ImageDTO imageDTO = recordServiceImp.noteRecord(id, note);
+        respondData.setData(imageDTO);
+        respondData.setDesc("Update image note successfully!");
+        return new ResponseEntity<>(respondData, HttpStatus.OK);
+    }
+
+    @PutMapping("/remove")
+    public ResponseEntity<?> removeTheRecord(@RequestParam int id){
+        RespondData respondData = new RespondData();
+
+        ImageDTO imageDTO = recordServiceImp.removeRecord(id);
+        respondData.setData(imageDTO);
+        respondData.setDesc("Remove image  successfully!");
+        return new ResponseEntity<>(respondData, HttpStatus.OK);
+    }
+
+    @PutMapping("/restore")
+    public ResponseEntity<?> restoreTheRecord(@RequestParam int id){
+        RespondData respondData = new RespondData();
+
+        ImageDTO imageDTO = recordServiceImp.restoreRecord(id);
+        respondData.setData(imageDTO);
+        respondData.setDesc("Restore image successfully!");
         return new ResponseEntity<>(respondData, HttpStatus.OK);
     }
 
@@ -65,9 +95,11 @@ public class RecordController {
 
         ImageDTO imageDTO = recordServiceImp.deleteRecord(id);
         respondData.setData(imageDTO);
-        respondData.setDesc("Delete image successfully!");
+        respondData.setDesc("Delete image permanantly !");
         return new ResponseEntity<>(respondData, HttpStatus.OK);
     }
+
+
 
 
 

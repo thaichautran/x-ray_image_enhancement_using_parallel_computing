@@ -13,4 +13,13 @@ public interface AlbumServiceImp {
 
     List<AlbumDTO> getMarkRecord(boolean status);
 
+    List<AlbumDTO> getTrashRecords();
+
+    List<AlbumDTO> deleteTrash();
+    List<AlbumDTO> searchInforPhoneAddress(String phoneAddress);
+
+
+
+
+
 }

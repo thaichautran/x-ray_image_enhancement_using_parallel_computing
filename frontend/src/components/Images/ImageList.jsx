@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import ImageItem from "./ImageItem";
 import { Row, Col } from "antd";
-export default function ImageList({ imageList }) {
+export default function ImageList({ imageList, getNewList }) {
   const renderImageList = () => {
     return imageList.map((image) => {
       return (
@@ -10,6 +10,7 @@ export default function ImageList({ imageList }) {
             key={image.imageId}
             imageList={imageList}
             image={image}
+            getNewList={getNewList}
           ></ImageItem>
         </Col>
       );

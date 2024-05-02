@@ -7,6 +7,12 @@ import numpy as np
 import base64
 from PIL import Image
 from numba import njit, jit
+import matplotlib.pyplot as plt
+from collections import OrderedDict
+import requests
+from flask_cors import CORS
+from joblib import Parallel, delayed
+
 
 # Chuẩn hóa lại val theo khoảng giá trị mới
 # hàm này chạy ở run list, không chạy ở run one, tránh error astype
@@ -218,42 +224,46 @@ def run_one(gray_normalized_image: np.ndarray):
 
 
 app = Flask(__name__)
-
+CORS(app)
 @app.route('/')
 def home():
     return "Hello, World!"
 
 @app.route('/convert', methods=['POST'])
 def convert_images():
-    if 'images' not in request.files:
-        return jsonify({'error': 'No images provided'}), 400
-    
-    images = request.files.getlist('images')
-    clip_limit = float(request.form.get('clip_limit', 8))
-    
     try:
-        processed_images = []
-        for img_file in images:
-            # Đọc dữ liệu từ file ảnh và chuyển đổi thành mảng numpy
-            img_data = np.frombuffer(img_file.read(), np.uint8)
-            image = cv2.imdecode(img_data, cv2.IMREAD_COLOR)
-            processed_images.append(image)
-
-        processed_images = run(processed_images, clip_limit)
+        request_data = request.json
         
+        if not isinstance(request_data, dict):
+            return jsonify({'error': 'Invalid JSON format'}), 400
+
+        url = request_data.get('image_url', "")  # Assumed the image URLs are sent in JSON format
+
+        if not url:
+            return jsonify({'error': 'No image URLs provided'}), 400
+        
+    
+        # Lấy dữ liệu hình ảnh từ URL
+        response = requests.get(url)
+        img_data = np.frombuffer(response.content, np.uint8)
+        image = cv2.imdecode(img_data, cv2.IMREAD_COLOR)
+        
+        processed_images = run(image)
+
+        base64_images = []
+        for image in processed_images:
+            image = image.astype(np.uint8)
+            image_data = Image.fromarray(image)
+            buffer = io.BytesIO()
+            image_data.save(buffer, format='JPEG')
+            base64_image = base64.b64encode(buffer.getvalue()).decode('utf-8')
+            base64_images.append(f'data:image/jpeg;base64,{base64_image}')
+
+        return jsonify({'data': base64_images}), 200
+    
     except Exception as e:
         return jsonify({'error': str(e)}), 400
-    
-    base64_images = []
-    for image in processed_images:
-        image = image.astype(np.uint8)
-        image_data = Image.fromarray(image)
-        buffer = io.BytesIO()
-        image_data.save(buffer, format='JPEG')
-        base64_image = base64.b64encode(buffer.getvalue()).decode('utf-8')
-        base64_images.append(base64_image)
 
-    return jsonify({'data': base64_images}), 200
     
 if __name__ == '__main__':
     app.run(debug=True)
