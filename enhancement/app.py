@@ -6,11 +6,10 @@ from flask import Flask, request, jsonify
 import numpy as np
 import base64
 from PIL import Image
-import matplotlib.pyplot as plt
-from collections import OrderedDict
-from joblib import Parallel, delayed
+from numba import njit, jit
 
 # Chuẩn hóa lại val theo khoảng giá trị mới
+# hàm này chạy ở run list, không chạy ở run one, tránh error astype
 def normalize(min_old, max_old, min_new, max_new, val):
 	'''Normalizes values to the interval [min_new, max_new]
 
@@ -27,6 +26,7 @@ def normalize(min_old, max_old, min_new, max_new, val):
 	return normalized.astype(np.uint8)
 
 # Chuyển image sang ảnh xám.
+# hàm này chạy ở run list, không chạy ở run one, tránh error astype
 def to_grayscale(image):
 	# red_v, green_v và blue_v là các mảng 2D chứa giá trị kênh màu
 	red_v = image[:, :, 0] * 0.299
@@ -38,8 +38,8 @@ def to_grayscale(image):
 
 #CLAHE FUNCTION
 #ALL UTILITY FUNCTIONS COMBINED INTO ONE FUNCTION
-#CLAHE FUNCTION, ALL UTILITY FUNCTIONS COMBINED INTO ONE FUNCTION
-def clahe(img,clipLimit, tile=32):
+@njit
+def clahe(img: np.ndarray ,clipLimit: np.uint8, tile: int = 32):
     '''img - Input image
        clipLimit - Normalized clipLimit. Higher value gives more contrast
        nBins - Number of graylevel bins for histogram("dynamic range")
@@ -49,7 +49,7 @@ def clahe(img,clipLimit, tile=32):
         return
 
     h, w = img.shape
-    
+
     # pixel xám trong python có 256 giá trị từ 0 đến 255
     nBins=256
 
@@ -58,25 +58,22 @@ def clahe(img,clipLimit, tile=32):
     ysz = tile
 
     # nX và nY là số ô có kích thước xsz * ysz trong ảnh kết quả.
-
-    nX = np.ceil(h/xsz).astype(int)#240
-    nY = np.ceil(w/ysz).astype(int)#320
-
-    #Excess number of pixels to get an integer value of nX and nY
     nX = int(np.ceil(h/xsz))#240
     nY = int(np.ceil(w/ysz))#320
 
+    #Excess number of pixels to get an integer value of nX and nY
     # Tính phần bị thiếu nếu như chia ảnh thành các ô theo kích thước xsz và ysz
     excX = int(xsz*(nX-h/xsz))
     excY = int(ysz*(nY-w/ysz))
-
+    
     # Thêm các phần tử '0' vào mảng img dựa trên giá trị excX và excY vừa tính để đạt đủ kích thước cho nX * nY ô
     if excX!=0:
-        img = np.append(img, np.zeros((excX, img.shape[1]), dtype=int), axis=0)
+        temp_zero_x = np.zeros(shape= (excX, img.shape[1]), dtype=img.dtype)
+        img = np.append(img, temp_zero_x, axis=0)
+        
     if excY!=0:
-        img = np.append(img,np.zeros((img.shape[0],excY)).astype(int),axis=1)
-        img = np.append(img, np.zeros((img.shape[0], excY), dtype=int), axis=1)
-
+        temp_zero_y = np.zeros(shape= (img.shape[0], excY), dtype=img.dtype)
+        img = np.append(img, temp_zero_y, axis=1)
 
     # Tính số lượng pixel cần xử lý tính toán
     nPixels = xsz*ysz
@@ -92,22 +89,13 @@ def clahe(img,clipLimit, tile=32):
     minVal = np.min(img)
     maxVal = np.max(img)
 
-    binSz = np.floor(1+(maxVal-minVal)/float(nBins))
-    LUT = np.floor((np.arange(minVal,maxVal+1)-minVal)/float(binSz))
-
-    #BACK TO CLAHE
-    bins = LUT[img]
-    print(bins.shape)
-
-    #makeHistogram
-
     # Tạo mảng hist lưu giá trị histogram cho từng ô
     print("...Making the Histogram...")
     hist = np.zeros((nX,nY,nBins))
     print(nX,nY,hist.shape)
     for i in range(nX):
         for j in range(nY):
-            bin_ = bins[i*xsz:(i+1)*xsz,j*ysz:(j+1)*ysz].astype(int)
+            bin_ = img[i*xsz:(i+1)*xsz,j*ysz:(j+1)*ysz]
             for i1 in range(xsz):
                 for j1 in range(ysz):
                     hist[i,j,bin_[i1,j1]]+=1
@@ -145,9 +133,7 @@ def clahe(img,clipLimit, tile=32):
                     if nExcess < 1:
                         break
 
-    #mapHistogram
-    # Giống như tạo mảng giá trị cdf
-    #mapHistogram. Giống như tạo mảng giá trị cdf
+    #mapHistogram, giống như tạo mảng giá trị cdf
     print("...Mapping the Histogram...")
     map_ = np.zeros((nX,nY,nBins))
     #print(map_.shape)
@@ -196,7 +182,7 @@ def clahe(img,clipLimit, tile=32):
             LB = map_[xB,yL,:]
             RB = map_[xB,yR,:]
             #print("CLAHE vals...")
-            subBin = bins[xI:xI+subX,yI:yI+subY]
+            subBin = img[xI:xI+subX,yI:yI+subY]
             #print("clahe subBin shape: ",subBin.shape)
             subImage = np.zeros(subBin.shape)
             num = subX*subY
@@ -204,7 +190,7 @@ def clahe(img,clipLimit, tile=32):
                 inverseA = subX-a
                 for b in range(subY):
                     inverseB = subY-b
-                    val = subBin[a,b].astype(int)
+                    val = subBin[a,b]
                     subImage[a,b] = np.floor((inverseA*(inverseB*LU[val] + b*RU[val])+ a*(inverseB*LB[val] + b*RB[val]))/float(num))
             clahe_img[xI:xI+subX,yI:yI+subY] = subImage
             yI += subY
@@ -219,17 +205,14 @@ def clahe(img,clipLimit, tile=32):
     else:
         return clahe_img
 
-# Thử nghiệm song song. Xử lý 1 ảnh và trả về kết quả là list chứa các ảnh với clipLimit khác nhau.
-def run(image):
+# Xử lý song song. Xử lý 1 ảnh và trả về kết quả là list chứa các ảnh với clipLimit khác nhau.
+@njit(parallel = True)
+def run_one(gray_normalized_image: np.ndarray):
+    """Input: grayscale and normalized imaged"""
     processed_images = []
-    if len(image.shape) > 2:
-        image = to_grayscale(image)
-
-    normalized_image = normalize(np.min(image), np.max(image), 0, 255, image)
-
-    # Sử dụng Parallel và delayed để chạy vòng for song song
-    results = Parallel(n_jobs=-1)(delayed(clahe)(img=normalized_image, clipLimit=i) for i in range(4, 64, 4))
-    processed_images.extend(results)
+    for i in range(4, 64, 4):
+        equalized_image = clahe(img = gray_normalized_image, clipLimit=i)
+        processed_images.append(equalized_image)
 
     return processed_images
 
