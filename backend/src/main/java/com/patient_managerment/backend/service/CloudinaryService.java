@@ -39,6 +39,7 @@ public class CloudinaryService implements CloudinaryServiceImp {
 
     @Autowired
     AlbumRepository albumRepository;
+
     @Override
     public Map upload(MultipartFile file) {
         try {
@@ -49,14 +50,12 @@ public class CloudinaryService implements CloudinaryServiceImp {
         }
     }
 
-
-
     @Override
     public ImagesDTO uploadImages(UploadRequest uploadRequest, List<MultipartFile> files) {
         List<Record> listRecordSave = new ArrayList<>();
         List<String> urls = new ArrayList<>();
         Optional<Doctor> doctor = doctorRepository.findById(1);
-        for(MultipartFile multipartFile : files){
+        for (MultipartFile multipartFile : files) {
 
             Date originCreatedDate = null;
 
@@ -103,7 +102,6 @@ public class CloudinaryService implements CloudinaryServiceImp {
             record.setUpdateDate(new Date());
 
 
-
             if (doctor.isPresent()) {
                 record.setDoctor(doctor.get());
             }
@@ -118,58 +116,163 @@ public class CloudinaryService implements CloudinaryServiceImp {
 
         recordRepository.saveAll(listRecordSave);
 
-        Record recordPhone = recordRepository.findTopByPhone(uploadRequest.getPhone());
-        if(recordPhone != null){
-//            System.out.println(recordPhone.toString());
-//            System.out.println("phone" + " " + " " + recordPhone.getPhone());
-//            System.out.println(recordPhone.getId());
-            List<ImageAlbum> imageAlbumValue = imageAlbumRepository.findImageAlbumsByRecordId(recordPhone.getId());
-//            System.out.print(imageAlbumValue);
-//            System.out.println("hello album balue");
-            if(imageAlbumValue.size() == 0){
-//                System.out.println("ehllo HMD");
-                Album album = new Album();
-                album.setDoctor(doctor.get());
-                album.setName(uploadRequest.getPhone());
-                album.setCreateDate(new Date());
-                album.setUpdateDate(new Date());
-                albumRepository.save(album);
+        Album albumExisted = albumRepository.findByName(uploadRequest.getPhone());
+        if (albumExisted == null) {
 
-                List<ImageAlbum> imageAlbumList = new ArrayList<>();
-                Album albumCreate = albumRepository.findByName(uploadRequest.getPhone());
+            Album album = new Album();
+            album.setDoctor(doctor.get());
+            album.setName(uploadRequest.getPhone());
+            album.setCreateDate(new Date());
+            album.setUpdateDate(new Date());
+            albumRepository.save(album);
 
-                for(String url : urls){
-                    Record record = recordRepository.findByUrl(url);
-                    ImageAlbum imageAlbum = new ImageAlbum();
-                    Record recordItem = recordRepository.findByUrl(url);
-                    KeyImageAlbum keyImageAlbum = new KeyImageAlbum(albumCreate.getId(), recordItem.getId());
-                    imageAlbum.setKeyImageAlbum(keyImageAlbum);
-                    imageAlbumList.add(imageAlbum);
-                }
-                imageAlbumRepository.saveAll(imageAlbumList);
-            } else {
-                List<ImageAlbum> imageAlbumList = new ArrayList<>();
-                Album albumCreate = albumRepository.findByName(uploadRequest.getPhone());
+            List<ImageAlbum> imageAlbumList = new ArrayList<>();
+            Album albumCreated = albumRepository.findByName(uploadRequest.getPhone());
 
-                for(String url : urls){
-                    Record record = recordRepository.findByUrl(url);
-                    ImageAlbum imageAlbum = new ImageAlbum();
-                    Record recordItem = recordRepository.findByUrl(url);
-                    KeyImageAlbum keyImageAlbum = new KeyImageAlbum(albumCreate.getId(), recordItem.getId());
-                    imageAlbum.setKeyImageAlbum(keyImageAlbum);
-                    imageAlbumList.add(imageAlbum);
-                }
-                imageAlbumRepository.saveAll(imageAlbumList);
+            for (String url : urls) {
+                ImageAlbum imageAlbum = new ImageAlbum();
+                Record recordItem = recordRepository.findByUrl(url);
+                System.out.println(album.getId() + " " + recordItem.getId());
+                KeyImageAlbum keyImageAlbum = new KeyImageAlbum(albumCreated.getId(), recordItem.getId());
+                imageAlbum.setKeyImageAlbum(keyImageAlbum);
+                imageAlbumList.add(imageAlbum);
             }
-        }
-//        if(recordPhone == null){
-//
-//
-//
-//        }
+            imageAlbumRepository.saveAll(imageAlbumList);
+        } else {
+            List<ImageAlbum> imageAlbumList = new ArrayList<>();
 
+            for (String url : urls) {
+                ImageAlbum imageAlbum = new ImageAlbum();
+                Record recordItem = recordRepository.findByUrl(url);
+                KeyImageAlbum keyImageAlbum = new KeyImageAlbum(albumExisted.getId(), recordItem.getId());
+                imageAlbum.setKeyImageAlbum(keyImageAlbum);
+                imageAlbumList.add(imageAlbum);
+            }
+            imageAlbumRepository.saveAll(imageAlbumList);
+        }
         return null;
+
     }
 
 
 }
+
+
+//    @Override
+//    public ImagesDTO uploadImages(UploadRequest uploadRequest, List<MultipartFile> files) {
+//        List<Record> listRecordSave = new ArrayList<>();
+//        List<String> urls = new ArrayList<>();
+//        Optional<Doctor> doctor = doctorRepository.findById(1);
+//        for(MultipartFile multipartFile : files){
+//
+//            Date originCreatedDate = null;
+//
+//            try {
+//                Metadata metadata = ImageMetadataReader.readMetadata(multipartFile.getInputStream(), multipartFile.getSize());
+//
+//                // Try to get Exif metadata
+//                ExifSubIFDDirectory exifDirectory = metadata.getFirstDirectoryOfType(ExifSubIFDDirectory.class);
+//                if (exifDirectory != null) {
+//                    Date tempDate = exifDirectory.getDate(ExifSubIFDDirectory.TAG_DATETIME_ORIGINAL);
+//                    int hour = tempDate.getHours();
+////                System.out.println("Hour: " + hour);
+//                    tempDate.setHours(hour - 7);
+////                System.out.println("Temp date after: " + tempDate);
+//                    originCreatedDate = tempDate;
+////                System.out.println("Origin date: " + originCreatedDate);
+//                } else {
+//                    originCreatedDate = new Date();
+//                }
+//            } catch (Exception e) {
+//                System.out.println("Error to get created date");
+//            }
+//
+//            Map data = upload(multipartFile);
+//            String url = (String) data.get("url");
+//            System.out.println("url: " + url);
+//
+//            urls.add(url);
+//
+//            Record record = new Record();
+//
+//            record.setUrl(url);
+//            record.setName(uploadRequest.getName());
+//            record.setSex(uploadRequest.getSex());
+//            record.setPhone(uploadRequest.getPhone());
+//            record.setMark(uploadRequest.isMark());
+//            record.setAddress(uploadRequest.getAddress());
+//            record.setBirthday(uploadRequest.getBirthday());
+//            record.setDoctorNote(uploadRequest.getDoctorNote());
+//            record.setHeight(uploadRequest.getHeight());
+//            record.setWeight(uploadRequest.getWeight());
+//            record.setMedicalHistory(uploadRequest.getMedicalHistory());
+//            record.setCreateDate(originCreatedDate);
+//            record.setUpdateDate(new Date());
+//
+//
+//
+//            if (doctor.isPresent()) {
+//                record.setDoctor(doctor.get());
+//            }
+//
+//            listRecordSave.add(record);
+////
+////            Image image1 = imageRepository.findByUrl(url);
+////            int idImage = image1.getId();
+////            return new ImageDTO(idImage, url, uploadRequest.getName(), uploadRequest.getLocation(),
+////                    uploadRequest.getDescription(), originCreatedDate, updateDate);
+//        }
+//
+//        recordRepository.saveAll(listRecordSave);
+//
+//        Record recordPhone = recordRepository.findTopByPhone(uploadRequest.getPhone());
+//        if(recordPhone != null){
+////            System.out.println(recordPhone.toString());
+////            System.out.println("phone" + " " + " " + recordPhone.getPhone());
+////            System.out.println(recordPhone.getId());
+//            List<ImageAlbum> imageAlbumValue = imageAlbumRepository.findImageAlbumsByRecordId(recordPhone.getId());
+////            System.out.print(imageAlbumValue);
+////            System.out.println("hello album balue");
+//            if(imageAlbumValue.size() == 0){
+////                System.out.println("ehllo HMD");
+//                Album album = new Album();
+//                album.setDoctor(doctor.get());
+//                album.setName(uploadRequest.getPhone());
+//                album.setCreateDate(new Date());
+//                album.setUpdateDate(new Date());
+//                albumRepository.save(album);
+//
+//                List<ImageAlbum> imageAlbumList = new ArrayList<>();
+//                Album albumCreate = albumRepository.findByName(uploadRequest.getPhone());
+//
+//                for(String url : urls){
+//                    Record record = recordRepository.findByUrl(url);
+//                    ImageAlbum imageAlbum = new ImageAlbum();
+//                    Record recordItem = recordRepository.findByUrl(url);
+//                    KeyImageAlbum keyImageAlbum = new KeyImageAlbum(albumCreate.getId(), recordItem.getId());
+//                    imageAlbum.setKeyImageAlbum(keyImageAlbum);
+//                    imageAlbumList.add(imageAlbum);
+//                }
+//                imageAlbumRepository.saveAll(imageAlbumList);
+//            } else {
+//                List<ImageAlbum> imageAlbumList = new ArrayList<>();
+//                Album albumCreate = albumRepository.findByName(uploadRequest.getPhone());
+//
+//                for(String url : urls){
+//                    Record record = recordRepository.findByUrl(url);
+//                    ImageAlbum imageAlbum = new ImageAlbum();
+//                    Record recordItem = recordRepository.findByUrl(url);
+//                    KeyImageAlbum keyImageAlbum = new KeyImageAlbum(albumCreate.getId(), recordItem.getId());
+//                    imageAlbum.setKeyImageAlbum(keyImageAlbum);
+//                    imageAlbumList.add(imageAlbum);
+//                }
+//                imageAlbumRepository.saveAll(imageAlbumList);
+//            }
+//        }
+//
+//
+//        return null;
+//    }
+
+
+
