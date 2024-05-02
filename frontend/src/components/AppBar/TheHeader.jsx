@@ -10,7 +10,7 @@ import {
 import { Button, Input, Avatar, Dropdown, Space, message, Modal } from "antd";
 import { Header } from "antd/es/layout/layout";
 import { useNavigate } from "react-router-dom";
-
+import { searchImage } from "../../apis/image";
 import UploadModal from "../Modals/UploadModal";
 export default function TheHeader({
   setCollapse,
@@ -19,7 +19,7 @@ export default function TheHeader({
 }) {
   const { Search } = Input;
   const navigate = useNavigate();
-  const [documentList, setDocumentList] = useState([]);
+  const [albumList, setAlbumList] = useState([]);
   const [keySearch, setKeySearch] = useState("");
   const [isBlur, setIsBlur] = useState(false);
 
@@ -28,54 +28,97 @@ export default function TheHeader({
     if (timer) clearTimeout(timer);
     timer = setTimeout(() => callback(), 500);
   };
-  // useEffect(() => {
-  //   searchDocuments(keySearch)
-  //     .then((res) => {
-  //       let result = res.data;
-  //       result = result.map((doc) => {
-  //         if (doc.name) {
-  //           return doc.name;
-  //         }
-  //         return doc.file_name;
-  //       });
-  //       setDocumentList([...new Set(result)]);
-  //     })
-  //     .catch((err) => {
-  //       console.log(err);
-  //     });
-  // if (keySearch) {
-  //   setTimeout(() => {
-  //     searchDocuments(keySearch)
-  //       .then((res) => {
-  //         let result = res.data;
-  //         result = result.map((doc) => {
-  //           if (doc.name) {
-  //             return doc.name;
-  //           }
-  //           return doc.file_name;
-  //         });
-  //         setDocumentList([...new Set(result)]);
-  //       })
-  //       .catch((err) => {
-  //         message.error("Không tìm thấy tài liệu nào!");
-  //       });
-  //   }, 300);
-  // }
-  // }, [keySearch]);
+  useEffect(() => {
+    searchImage(keySearch)
+      .then((res) => {
+        let firstImage = [];
+        res?.data?.forEach((album) => {
+          album?.imageDTOList?.forEach((image) => {
+            firstImage.push(image);
+          });
+        });
+        console.log(firstImage);
+        let result = firstImage?.map((item) => {
+          if (item?.name?.includes(keySearch)) {
+            return item.name;
+          } else if (item?.phone?.includes(keySearch)) {
+            return item?.phone;
+          } else if (item?.address?.includes(keySearch)) {
+            return item?.address;
+          } else {
+            return item?.name, item?.phone, item?.address;
+          }
+        });
 
-  const onSearch = async (value) => {};
+        setAlbumList([...new Set(result)]);
+      })
+      .catch((err) => {
+        message.error("Không tìm thấy ảnh nào!");
+        console.log(err);
+      });
+    // if (keySearch) {
+    //   setTimeout(() => {
+    //     searchImage(keySearch)
+    //       .then((res) => {
+    //         let result = res.data;
+    //         result = result.map((doc) => {
+    //           if (doc.name) {
+    //             return doc.name;
+    //           }
+    //           return doc.file_name;
+    //         });
+    //         setDocumentList([...new Set(result)]);
+    //       })
+    //       .catch((err) => {
+    //         message.error("Không tìm thấy tài liệu nào!");
+    //       });
+    //   }, 300);
+    // }
+  }, [keySearch]);
 
-  const renderDocumentList = () => {
-    return documentList.map((document, index) => {
+  const onSearch = async (keySearch) => {
+    searchImage(keySearch)
+      .then((res) => {
+        let firstImage = [];
+        res?.data?.forEach((album) => {
+          album?.imageDTOList?.forEach((image) => {
+            firstImage.push(image);
+          });
+        });
+        navigate(`/search/${keySearch}`, {
+          state: { imageList: firstImage },
+        });
+        let result = firstImage?.map((item) => {
+          if (item?.name?.includes(keySearch)) {
+            return item.name;
+          } else if (item?.phone?.includes(keySearch)) {
+            return item?.phone;
+          } else if (item?.address?.includes(keySearch)) {
+            return item?.address;
+          } else {
+            return item?.name, item?.phone, item?.address;
+          }
+        });
+
+        setAlbumList([...new Set(result)]);
+      })
+      .catch((err) => {
+        message.error("Không tìm thấy ảnh nào!");
+        console.log(err);
+      });
+  };
+
+  const renderAlbumList = () => {
+    return albumList.map((album, index) => {
       return (
         <Fragment>
           <li
             onClick={() => {
-              onSearch(document);
+              onSearch(album);
             }}
             key={index}
           >
-            {document}
+            {album}
           </li>
         </Fragment>
       );
@@ -156,7 +199,19 @@ export default function TheHeader({
             height: 64,
           }}
         />
-        <Search style={{ width: "50%" }}></Search>
+        <Search
+          style={{ width: "50%" }}
+          onChange={(e) => debounce(() => setKeySearch(e.target.value))}
+          onFocus={() => setIsBlur(false)}
+          onBlur={() => setTimeout(() => setIsBlur(true), 200)}
+          onSearch={onSearch}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              onSearch(keySearch);
+              setTimeout(() => setIsBlur(true), 200);
+            }
+          }}
+        ></Search>
         <div
           className="header-right"
           style={{
@@ -184,10 +239,11 @@ export default function TheHeader({
         className="search-list"
         style={{
           right: !collapsed ? "0" : "12%",
+          zIndex: "10",
         }}
       >
-        {documentList.length > 0 && keySearch && !isBlur ? (
-          <ul className="search-ul">{renderDocumentList()}</ul>
+        {albumList.length > 0 && keySearch && !isBlur ? (
+          <ul className="search-ul">{renderAlbumList()}</ul>
         ) : (
           ""
         )}

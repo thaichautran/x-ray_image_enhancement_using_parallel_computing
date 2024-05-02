@@ -6,3 +6,5 @@ matplotlib
 opencv-python
 joblib
 numba
+flask_cors
+requests

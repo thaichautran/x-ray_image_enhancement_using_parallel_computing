@@ -1,5 +1,15 @@
 import React, { useState, useEffect } from "react";
-import { Row, Col, Select, Button, DatePicker, Form, Input, Modal } from "antd";
+import {
+  Row,
+  Col,
+  Select,
+  Button,
+  DatePicker,
+  Form,
+  Input,
+  Modal,
+  message,
+} from "antd";
 import { PlusOutlined, UploadOutlined } from "@ant-design/icons";
 import { Image, Upload } from "antd";
 import dayjs from "dayjs";
@@ -20,6 +30,7 @@ export default function UploadModal() {
     weight: "",
     medicalHistory: "",
   });
+
   //Modal
   const [isModalOpen, setIsModalOpen] = useState(false);
   const showModal = () => {
@@ -57,7 +68,27 @@ export default function UploadModal() {
     setPreviewOpen(true);
   };
   const handleChange = ({ fileList: newFileList }) => setFileList(newFileList);
-  const beforeUpload = () => {
+  const beforeUpload = (file) => {
+    const isJpgOrPng =
+      file.type === "image/jpeg" ||
+      file.type === "image/png" ||
+      file.type === "image/jpg";
+    if (!isJpgOrPng) {
+      message.error("Chỉ có thể tải lên ảnh!");
+      return true;
+    }
+    if (
+      file.type === "image/jpeg" ||
+      file.type === "image/png" ||
+      file.type === "image/jpg"
+    ) {
+      const isLt10M = file.size / 1024 / 1024 < 10;
+      if (!isLt10M) {
+        message.error("Ảnh phải nhỏ hơn 10MB!");
+        return true;
+      }
+      return false;
+    }
     return false;
   };
 
@@ -137,13 +168,24 @@ export default function UploadModal() {
       <Modal
         title={<h2>Tải lên ảnh X-quang</h2>}
         open={isModalOpen}
-        onOk={onFinish}
         onCancel={handleCancel}
-        confirmLoading={loading}
         width={1000}
-        okText="Tải lên"
-        okButtonProps={{ style: { backgroundColor: "#00BDD6" } }}
         cancelText="Hủy"
+        footer={(_, { OkBtn, CancelBtn }) => (
+          <>
+            <CancelBtn />
+            <Button
+              type="primary"
+              loading={loading}
+              disabled={!formState.phone || fileList.length <= 0}
+              onClick={() => {
+                onFinish();
+              }}
+            >
+              Tải lên
+            </Button>
+          </>
+        )}
       >
         <Row gutter={16}>
           <Col span={12}>
@@ -197,12 +239,14 @@ export default function UploadModal() {
                 </Form.Item>
                 <Form.Item
                   label="Số điện thoại"
+                  required
                   style={{
                     display: "inline-block",
                     width: "calc(33.3% - 12px)",
                   }}
                 >
                   <Input
+                    required
                     value={formState.phone}
                     onChange={(e) => {
                       setFormState({

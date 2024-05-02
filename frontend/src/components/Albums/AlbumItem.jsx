@@ -7,28 +7,41 @@ import "../../assets/scss/components/ImageItem.scss";
 export default function AlbumItem({ album, getNewList }) {
   const navigate = useNavigate();
 
-  return (
+  return album.imageDTOList.length > 0 ? (
     <div id="image-item">
       <Col
         onClick={() => {
           navigate(`/album/${album.name}`, {
-            state: { imageList: album.imageDTOList },
+            state: { imageList: album?.imageDTOList },
           });
         }}
-        style={{ cursor: "pointer" }}
+        style={{
+          cursor: "pointer",
+          display:
+            album?.imageDTOList.length > 0 ? "inline-block" : "none !important",
+        }}
       >
         <img
           className="image album-cover"
-          src={album.imageDTOList[0].url}
-          alt={album.name}
+          src={
+            album?.imageDTOList.length > 0
+              ? album.imageDTOList[0].url
+              : require("../../assets/images/image_not_found.jpg")
+          }
+          alt={album?.name}
         />
         <div className="image-info">
           <p style={{ fontSize: "1rem", fontWeight: "600" }}>
-            BN - {album.imageDTOList[0].name}
+            BN -{" "}
+            {album?.imageDTOList.length > 0
+              ? album.imageDTOList[0]?.name
+              : album.name}
           </p>
           <p>{album.imageDTOList.length} ảnh</p>
         </div>
       </Col>
     </div>
+  ) : (
+    <div style={{ display: "none" }}></div>
   );
 }

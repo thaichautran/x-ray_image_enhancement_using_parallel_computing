@@ -7,6 +7,13 @@ import {
   MARK_IMAGE,
   GET_MARKS,
   DOWNLOAD,
+  GET_TRASH,
+  REMOVE,
+  RESTORE,
+  UPDATE_NOTE,
+  DELETE,
+  DELETE_TRASH,
+  SEARCH,
 } from "./constants";
 
 const getAlbums = () => {
@@ -30,6 +37,28 @@ const getMarkImages = () => {
 const downloadImage = (base64String) => {
   return axios.post(`${DOWNLOAD}`, base64String);
 };
+
+const getTrash = () => {
+  return axios.get(`${GET_TRASH}`);
+};
+const remove = (id) => {
+  return axios.put(`${REMOVE}?id=${id}`);
+};
+const restore = (id) => {
+  return axios.put(`${RESTORE}?id=${id}`);
+};
+const updateNote = (id, note) => {
+  return axios.put(`${UPDATE_NOTE}?id=${id}&note=${note}`);
+};
+const deleteImage = (id) => {
+  return axios.delete(`${DELETE}?id=${id}`);
+};
+const deleteTrash = () => {
+  return axios.delete(`${DELETE_TRASH}`);
+};
+const searchImage = (phoneAddress) => {
+  return axios.get(`${SEARCH}?phoneAddress=${phoneAddress}`);
+};
 export {
   getAlbums,
   uploadImage,
@@ -38,4 +67,11 @@ export {
   markImage,
   getMarkImages,
   downloadImage,
+  getTrash,
+  remove,
+  restore,
+  updateNote,
+  deleteImage,
+  deleteTrash,
+  searchImage,
 };

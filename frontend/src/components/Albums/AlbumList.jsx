@@ -3,9 +3,10 @@ import { Row, Col } from "antd";
 import AlbumItem from "./AlbumItem";
 export default function AlbumList({ albumList, getNewList }) {
   useEffect(() => {}, [albumList]);
+
   const renderAlbumList = () => {
     return albumList.map((album) => {
-      return (
+      return album.imageDTOList.length > 0 ? (
         <Col span={4}>
           <AlbumItem
             getNewList={getNewList}
@@ -13,6 +14,8 @@ export default function AlbumList({ albumList, getNewList }) {
             album={album}
           ></AlbumItem>
         </Col>
+      ) : (
+        <div style={{ display: "none" }}></div>
       );
     });
   };

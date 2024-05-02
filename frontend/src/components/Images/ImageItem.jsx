@@ -104,6 +104,7 @@ export default function ImageItem({ image, imageList, getNewList }) {
           image={image}
           imageList={imageList}
           onCancel={handleCancel}
+          getNewList={getNewList}
         ></ImageModal>
       </Modal>
     </div>
