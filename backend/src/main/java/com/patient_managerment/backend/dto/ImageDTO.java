@@ -26,6 +26,7 @@ public class ImageDTO {
     private String medicalHistory;
 
     private String doctorNote;
+    private boolean isRemove;
     public ImageDTO() {
 
     }
@@ -157,5 +158,13 @@ public class ImageDTO {
 
     public void setImageId(int imageId) {
         this.imageId = imageId;
+    }
+
+    public boolean isRemove() {
+        return isRemove;
+    }
+
+    public void setRemove(boolean remove) {
+        isRemove = remove;
     }
 }
