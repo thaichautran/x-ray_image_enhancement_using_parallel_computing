@@ -270,7 +270,8 @@ public class AlbumService implements AlbumServiceImp {
 
                 List<ImageDTO> imageDTOList = new ArrayList<>();
                 for (Record image : recordList) {
-                    if ( (image.getPhone() != null && image.getPhone().contains(phoneAddress)) || (image.getAddress() != null && image.getAddress().contains(phoneAddress))) {
+                    if ( (image.getPhone() != null && image.getPhone().contains(phoneAddress)) || (image.getAddress() != null && image.getAddress().contains(phoneAddress)
+                            || (image.getName() != null && image.getName().contains(phoneAddress)))) {
                         ImageDTO imageDTO = new ImageDTO();
 
                         imageDTO.setImageId(image.getId());
