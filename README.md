@@ -1,5 +1,5 @@
 # Enhancing Chest X-ray image quality to aid rib fracture detection using parallel computing 
-Welcome to the Rib Fracture Detection System, where technology meets medical diagnostics. This system is designed to enhance chest X-ray image quality through parallel computing, ultimately improving the accuracy of rib fracture detection.
+Welcome to the Chest X-ray Enhancement System, where technology meets medical diagnostics. This system is designed to enhance chest X-ray image quality through parallel computing, ultimately improving the accuracy of rib fracture detection.
 
 ## Installation guide
 Our comprehensive user manual will guide you through the system's features and functionalities, empowering you to effectively manage patient profiles and optimize diagnostic accuracy. Whether you're a medical professional or a technology enthusiast, this manual is your go-to resource for leveraging the full potential of the Rib Fracture Detection System.
