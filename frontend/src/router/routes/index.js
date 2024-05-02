@@ -2,6 +2,7 @@ import ImageByAlbum from "../../components/Albums/ImageByAlbum";
 import ImageView from "../../components/Images/ImageView";
 import Careful from "../../pages/HomePage/Careful";
 import Home from "../../pages/HomePage/Home";
+import SearchList from "../../pages/HomePage/SearchList";
 import Trash from "../../pages/HomePage/Trash";
 import NotFound from "../../pages/NotFoundPage/NotFound";
 
@@ -26,6 +27,11 @@ export const routes = [
   {
     path: "/trash",
     page: Trash,
+    isShowHeader: true,
+  },
+  {
+    path: "/search/:name",
+    page: SearchList,
     isShowHeader: true,
   },
   // {

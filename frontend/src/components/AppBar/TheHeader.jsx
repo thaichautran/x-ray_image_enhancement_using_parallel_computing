@@ -31,29 +31,29 @@ export default function TheHeader({
   useEffect(() => {
     searchImage(keySearch)
       .then((res) => {
-        let firstImage = res?.data?.imageDTOList?.find(
-          (image) => image?.length > 0
-        );
+        let firstImage = [];
+        res?.data?.forEach((album) => {
+          album?.imageDTOList?.forEach((image) => {
+            firstImage.push(image);
+          });
+        });
         console.log(firstImage);
         let result = firstImage?.map((item) => {
           if (item?.name?.includes(keySearch)) {
-            return item.name?.split("\n")[0].trim();
+            return item.name;
           } else if (item?.phone?.includes(keySearch)) {
-            return item?.phone?.split("\n")[0].trim();
+            return item?.phone;
           } else if (item?.address?.includes(keySearch)) {
-            return item?.address?.split("\n")[0].trim();
+            return item?.address;
           } else {
-            return (
-              item?.name?.split("\n")[0].trim(),
-              item?.phone?.split("\n")[0].trim(),
-              item?.address?.split("\n")[0].trim()
-            );
+            return item?.name, item?.phone, item?.address;
           }
         });
 
         setAlbumList([...new Set(result)]);
       })
       .catch((err) => {
+        message.error("Không tìm thấy ảnh nào!");
         console.log(err);
       });
     // if (keySearch) {
@@ -79,25 +79,24 @@ export default function TheHeader({
   const onSearch = async (keySearch) => {
     searchImage(keySearch)
       .then((res) => {
-        let firstImage = res?.data?.map((album) => {
-          return album?.imageDTOList?.map((image) => {
-            return image;
+        let firstImage = [];
+        res?.data?.forEach((album) => {
+          album?.imageDTOList?.forEach((image) => {
+            firstImage.push(image);
           });
         });
-        console.log(firstImage);
+        navigate(`/search/${keySearch}`, {
+          state: { imageList: firstImage },
+        });
         let result = firstImage?.map((item) => {
           if (item?.name?.includes(keySearch)) {
-            return item.name?.split("\n")[0].trim();
+            return item.name;
           } else if (item?.phone?.includes(keySearch)) {
-            return item?.phone?.split("\n")[0].trim();
+            return item?.phone;
           } else if (item?.address?.includes(keySearch)) {
-            return item?.address?.split("\n")[0].trim();
+            return item?.address;
           } else {
-            return (
-              item?.name?.split("\n")[0].trim(),
-              item?.phone?.split("\n")[0].trim(),
-              item?.address?.split("\n")[0].trim()
-            );
+            return item?.name, item?.phone, item?.address;
           }
         });
 
@@ -119,7 +118,7 @@ export default function TheHeader({
             }}
             key={index}
           >
-            {album?.name}
+            {album}
           </li>
         </Fragment>
       );

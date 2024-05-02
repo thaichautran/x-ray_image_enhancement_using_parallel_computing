@@ -39,7 +39,7 @@ import {
 import InfiniteScroll from "react-infinite-scroll-component";
 import { useLocation } from "react-router-dom";
 import dayjs from "dayjs";
-import { remove, deleteImage, restore } from "../../apis/image";
+import { remove, deleteImage, restore, updateNote } from "../../apis/image";
 export default function ImageModal({
   image,
   imageList,
@@ -53,6 +53,19 @@ export default function ImageModal({
     link.href = base64string;
     link.download = "image.jpg";
     link.click();
+  };
+  const handlUpdateNote = async () => {
+    setLoading(true);
+    await updateNote(image.imageId, doctorNote)
+      .then((res) => {
+        message.success("Cập nhật ghi chú thành công");
+        setLoading(false);
+        setIsEdit(false);
+      })
+      .catch((err) => {
+        message.error("Cập nhật ghi chú không thành công");
+        setLoading(false);
+      });
   };
   const calculateAge = (birthday) => {
     const birthDate = new Date(birthday);
@@ -203,8 +216,9 @@ export default function ImageModal({
         {enhancedImageList?.length > 0 && enhancedImage ? (
           <Col span={12}>
             <Image className="image" src={enhancedImage} alt={image.name} />
+            <h2 style={{ marginTop: "2rem" }}>Độ tương phản</h2>
             <Slider
-              style={{ width: "90%", marginTop: "4rem" }}
+              style={{ width: "90%", marginTop: "1rem" }}
               onChange={(value) => {
                 setEnhancedImage(enhancedImageList[value]);
               }}
@@ -242,6 +256,9 @@ export default function ImageModal({
               <TextArea
                 style={{ width: "100%" }}
                 defaultValue={doctorNote}
+                onChange={(e) => {
+                  setDoctorNote(e.target.value);
+                }}
               ></TextArea>
               <div style={{ marginTop: "1rem", marginBottom: "3rem" }}>
                 <Button
@@ -252,7 +269,13 @@ export default function ImageModal({
                 >
                   Hủy bỏ
                 </Button>
-                <Button style={{ backgroundColor: "black", color: "white" }}>
+                <Button
+                  style={{ backgroundColor: "black", color: "white" }}
+                  loading={loading}
+                  onClick={() => {
+                    handlUpdateNote();
+                  }}
+                >
                   Hoàn tất
                 </Button>
               </div>

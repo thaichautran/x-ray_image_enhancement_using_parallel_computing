@@ -7,7 +7,7 @@ import "../../assets/scss/components/ImageItem.scss";
 export default function AlbumItem({ album, getNewList }) {
   const navigate = useNavigate();
 
-  return (
+  return album.imageDTOList.length > 0 ? (
     <div id="image-item">
       <Col
         onClick={() => {
@@ -41,5 +41,7 @@ export default function AlbumItem({ album, getNewList }) {
         </div>
       </Col>
     </div>
+  ) : (
+    <div style={{ display: "none" }}></div>
   );
 }

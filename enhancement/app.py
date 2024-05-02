@@ -45,7 +45,7 @@ def to_grayscale(image):
 #CLAHE FUNCTION
 #ALL UTILITY FUNCTIONS COMBINED INTO ONE FUNCTION
 @njit
-def clahe(img: np.ndarray ,clipLimit: np.uint8, tile: int = 32):
+def clahe(img, clipLimit, tile = 32):
     '''img - Input image
        clipLimit - Normalized clipLimit. Higher value gives more contrast
        nBins - Number of graylevel bins for histogram("dynamic range")
@@ -242,8 +242,11 @@ def convert_images():
         response = requests.get(url)
         img_data = np.frombuffer(response.content, np.uint8)
         image = cv2.imdecode(img_data, cv2.IMREAD_COLOR)
-    
-        processed_images = run(image)
+        # Chuyển ảnh sang ảnh xám
+        if len(image.shape) > 2:
+            image = to_grayscale(image)
+        normalized_image = normalize(np.min(image), np.max(image), 0, 255, image)
+        processed_images = run_one(normalized_image)
 
         base64_images = []
         for image in processed_images:
